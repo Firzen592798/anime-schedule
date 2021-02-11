@@ -52,7 +52,7 @@ class Anime{
     //_dataLancamento = json['airing_start'];
     _episodios = json['episodes'];
     _score = json['score'];
-    _estudio = json['producers']['name'];
+    //_estudio = json['producers'][0]['name'];
     _tipo = json['type'];
 
   }

@@ -10,11 +10,11 @@ class ApiService{
   }
   static final ApiService _singleton = ApiService._internal();
 
-  static final Map _diasSemana = {"sunday": "Domingo", "monday": "Segunda", "tuesday": "Terça", "wednesday": "Quarta", "thursday": "Quinta", "friday": "Sexta", "saturday": "Sábado"}; 
-  //static final _diasSemana = ["sunday", "monday", "wednesday", "thursday", "friday", "saturday", "monday"]; 
+  static final Map _diasSemana = {"monday": "Segunda", "tuesday": "Terça", "wednesday": "Quarta", "thursday": "Quinta", "friday": "Sexta", "saturday": "Sábado", "sunday": "Domingo", }; 
+  static final List<String> _diasSemanaLista = [ "monday", "sunday", "wednesday", "thursday", "friday", "saturday"]; 
   ApiService._internal();
 
-  Future<ApiResponse> listarAnimes() async{
+  Future<ApiResponse> listarAnimes(diaSelecionado) async{
     String url = Properties.URL_API_CONSULTA + "/schedule";    
     print(url);
     http.Response response = await http.get(
@@ -25,10 +25,9 @@ class ApiService{
     if (response.statusCode == 200) {
       var dadosJson = json.decode(response.body);
       List<Anime> lista = [];
-      String dia = "sunday";
+      String dia = _diasSemanaLista[diaSelecionado];
       print(dadosJson);
       for (var item in dadosJson[dia]) {
-        print("Item");
         print(item);
         Anime anime = Anime.fromJson(item);
         anime.diaSemana = _diasSemana[dia];
