@@ -14,7 +14,26 @@ class ApiService{
   static final List<String> _diasSemanaLista = [ "monday", "sunday", "wednesday", "thursday", "friday", "saturday"]; 
   ApiService._internal();
 
-  Future<ApiResponse> listarAnimes(diaSelecionado) async{
+  listarAnimesUsuario(usuarioMal) async{
+    String url = Properties.URL_API_CONSULTA + "/user/"+usuarioMal+"/animelist/watching";    
+    http.Response response = await http.get(url);
+    ApiResponse apiResponse;
+    if (response.statusCode == 200) {
+      var dadosJson = json.decode(response.body);
+      //print(dadosJson);
+      List<Anime> lista = [];
+      for (var item in dadosJson['anime']) {
+        //print(item);
+        Anime anime = Anime.fromJson(item);
+        lista.add(anime);
+      }
+      
+      apiResponse = ApiResponse<List<Anime>>(data: lista, isError: false);
+    }
+
+  }
+
+  Future<ApiResponse> listarAnimesPorDia(diaSelecionado) async{
     String url = Properties.URL_API_CONSULTA + "/schedule";    
     print(url);
     http.Response response = await http.get(
@@ -26,9 +45,7 @@ class ApiService{
       var dadosJson = json.decode(response.body);
       List<Anime> lista = [];
       String dia = _diasSemanaLista[diaSelecionado];
-      print(dadosJson);
       for (var item in dadosJson[dia]) {
-        print(item);
         Anime anime = Anime.fromJson(item);
         anime.diaSemana = _diasSemana[dia];
         lista.add(anime);

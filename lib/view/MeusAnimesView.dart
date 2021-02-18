@@ -1,8 +1,11 @@
 import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/service/ApiService.dart';
 import 'package:animeschedule/util/ApiResponse.dart';
+import 'package:animeschedule/util/GlobalVar.dart';
+import 'package:animeschedule/widget/Dialogs.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MeusAnimesView extends StatefulWidget {
   @override
@@ -16,7 +19,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   int diaSelecionado = 0;
 
-  List<String> listaDias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+  List<String> listaDias = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
 
   @override
   void initState() {
@@ -25,15 +28,34 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
   }
 
   _carregarAnimes() async{
-    ApiResponse response = await _apiService.listarAnimes(diaSelecionado);
-    //print("Response: "+response.data[0].titulo);
-    if(!response.isError){
-      setState(() {
-        _listaAnimes = response.data;
-      });
-    }
+    SharedPreferences.getInstance().then((prefs) async{
+      String usuarioMAL = prefs.getString("usuarioMAL") ?? "";
+      print("Usuario MAL:"+usuarioMAL);
+      GlobalVar().usuarioMAL = usuarioMAL;
+      ApiResponse response = await _apiService.listarAnimesPorDia(diaSelecionado);
+      //print("Response: "+response.data[0].titulo);
+      if(!response.isError){
+        if(usuarioMAL != ""){
+          ApiResponse responseUsuario = await _apiService.listarAnimesUsuario(usuarioMAL);
+          if(!responseUsuario.isError){
+            List<Anime> listaAnimesDia = response.data;
+            List<Anime> listaAnimesUsuario = responseUsuario.data;
+            listaAnimesDia.forEach((animeDia) => {
+              for(int i = 0; i < listaAnimesUsuario.length; i++){
+                if(listaAnimesUsuario[i].id == animeDia.id){
+                  _listaAnimes.add(animeDia)
+                }
+              }
+            });
+          }
+        }else{
+          setState(() {
+            _listaAnimes = response.data;
+          });
+        }
+      }
+    });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +70,6 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
                 child: new Text(value),
               );
             }).toList(),
-            hint: Text("Please choose a location"),
             value: listaDias[diaSelecionado],
             onChanged: (newVal) {
               this.setState(() {
@@ -57,6 +78,18 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
               });
             },
           ),
+          IconButton(icon: Icon(Icons.person),  
+            onPressed: () async{
+              Dialogs.setarUsuarioMAL(context).then((response) {
+                GlobalVar().usuarioMAL = response;
+                SharedPreferences.getInstance().then((prefs) {
+                  prefs.setString('usuarioMAL', response);
+                });
+              });
+            }
+            
+          )
+          
           //Icon(Icons.more_vert),
         ],
       ),

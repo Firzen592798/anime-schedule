@@ -1,4 +1,3 @@
-import 'package:animeschedule/util/Token.dart';
 
 class GlobalVar{
   factory GlobalVar() {
@@ -8,10 +7,9 @@ class GlobalVar{
 
   GlobalVar._internal();
 
-  //Token do myanimelist
-  Token _token;
+  String _usuarioMAL;
 
-  set token(Token value) => _token = value;
+  String get usuarioMAL => _usuarioMAL;
 
-  Token get token => _token;
+  set usuarioMAL(String value) => _usuarioMAL = value;
 }

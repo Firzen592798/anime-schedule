@@ -31,6 +31,7 @@ dependencies:
   http: ^0.12.2
   webview_flutter: 
   fluttertoast: 
+  shared_preferences: 
 
 dev_dependencies:
   flutter_test:
