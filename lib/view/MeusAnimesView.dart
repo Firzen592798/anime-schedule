@@ -2,7 +2,6 @@ import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/service/ApiService.dart';
 import 'package:animeschedule/util/ApiResponse.dart';
 import 'package:animeschedule/util/GlobalVar.dart';
-import 'package:animeschedule/widget/Dialogs.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +14,7 @@ class MeusAnimesView extends StatefulWidget {
 class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   List<Anime> _listaAnimes = [];
+  List<Anime> _listaAnimesUsuario;
   ApiService _apiService = ApiService();
 
   int diaSelecionado = 0;
@@ -23,54 +23,71 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   @override
   void initState() {
-    _carregarAnimes();
     super.initState();
+    diaSelecionado = (DateTime.now().weekday - 1) % 7;
+    _carregarAnimes();
   }
 
   _carregarAnimes() async{
     SharedPreferences.getInstance().then((prefs) async{
       String usuarioMAL = prefs.getString("usuarioMAL") ?? "";
-      print("Usuario MAL:"+usuarioMAL);
+      print("Usuario mal: "+usuarioMAL);
       GlobalVar().usuarioMAL = usuarioMAL;
       ApiResponse response = await _apiService.listarAnimesPorDia(diaSelecionado);
-      //print("Response: "+response.data[0].titulo);
       if(!response.isError){
         if(usuarioMAL != ""){
-          ApiResponse responseUsuario = await _apiService.listarAnimesUsuario(usuarioMAL);
-          if(!responseUsuario.isError){
-            List<Anime> listaAnimesDia = response.data;
-            List<Anime> listaAnimesUsuario = responseUsuario.data;
-            listaAnimesDia.forEach((animeDia) => {
-              for(int i = 0; i < listaAnimesUsuario.length; i++){
-                if(listaAnimesUsuario[i].id == animeDia.id){
-                  _listaAnimes.add(animeDia)
-                }
+          if(_listaAnimesUsuario == null){
+            ApiResponse responseUsuario = await _apiService.listarAnimesUsuario(usuarioMAL);
+            if(!responseUsuario.isError){
+              _listaAnimesUsuario = responseUsuario.data;
+            }
+          }
+          List<Anime> listaAnimesDia = response.data;
+          _listaAnimes = [];
+          
+          //listaAnimesDia.forEach((animeDia) => {
+          for(int j = 0; j < listaAnimesDia.length; j++){
+            Anime animeDia = listaAnimesDia[j];
+            for(int i = 0; i < _listaAnimesUsuario.length; i++){
+              if(_listaAnimesUsuario[i].id == animeDia.id){               
+                _listaAnimes.add(animeDia);
+                _listaAnimes.last.episodiosAssistidos = _listaAnimesUsuario[i].episodiosAssistidos;
               }
-            });
+            }
           }
         }else{
-          setState(() {
-            _listaAnimes = response.data;
-          });
+          _listaAnimes = response.data;
         }
+        setState(() {});
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print("Build");
     return Scaffold(
       appBar: AppBar(
         title: Text("Lista de animes"),
         actions: [
-          new DropdownButton<String>(
+          Theme(
+            child: DropdownButton<String>(
             items: listaDias.map((String value) {
               return new DropdownMenuItem<String>(
                 value: value,
-                child: new Text(value),
+                child: new Text(
+                  value,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
               );
             }).toList(),
             value: listaDias[diaSelecionado],
+            style: new TextStyle(
+              color: Colors.white,
+            ),
             onChanged: (newVal) {
               this.setState(() {
                 diaSelecionado = listaDias.indexOf(newVal);
@@ -78,28 +95,25 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
               });
             },
           ),
-          IconButton(icon: Icon(Icons.person),  
-            onPressed: () async{
-              Dialogs.setarUsuarioMAL(context).then((response) {
-                GlobalVar().usuarioMAL = response;
-                SharedPreferences.getInstance().then((prefs) {
-                  prefs.setString('usuarioMAL', response);
-                });
-              });
-            }
-            
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors.blue.shade200,
           )
-          
-          //Icon(Icons.more_vert),
+          )
         ],
       ),
-      drawer: MenuLateral(),
+      drawer: MenuLateral(context),
       body: Column(
         children: <Widget>[
           Expanded(
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: _listaAnimes.length,
-              itemBuilder: criarItem
+              itemBuilder: criarItem,
+              separatorBuilder: (context, index) {
+                return Divider(
+                  indent: 0,
+                  height: 0,
+                );
+              },
             ),
           )
         ],
@@ -107,21 +121,30 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
     );
   }
 
+  
+
   Widget criarItem(context, index){
     //final item = _listaTarefas[index]["titulo"];
     return  Container(
-        padding: EdgeInsets.all(16),
         child: ListTile(
+          
           title: Text(_listaAnimes[index].titulo),
-          subtitle: Row(
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(this.diaSelecionado.toString()),
+              Text("Último Assistido: ${_listaAnimes[index].episodiosAssistidos}"),
               Text(_listaAnimes[index].diaSemana),
-              //_listaAnimes[index].episodios.toString() != null ? Text("Episódios: "+_listaAnimes[index].episodios.toString()) : Text("Episódios: Não especificado"),
-            ],
-          ),
-          trailing: Image.network(_listaAnimes[index].urlImagem)
-
+              /*Row(
+                children: [
+                  Text(_listaAnimes[index].diaSemana),
+                  //_listaAnimes[index].episodios.toString() != null ? Text("Episódios: "+_listaAnimes[index].episodios.toString()) : Text("Episódios: Não especificado"),
+                ],
+              ),*/
+              ],
+            ),
+            
+          
+          leading: Image.network(_listaAnimes[index].urlImagem, fit: BoxFit.fitHeight,)
         )
 
     );

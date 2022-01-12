@@ -1,4 +1,5 @@
 import 'package:animeschedule/view/MeusAnimesView.dart';
+import 'package:animeschedule/view/PreferenciasView.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,6 +13,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MeusAnimesView(),
+            routes: {
+        //'/test': (_) => SearchTest(),
+        '/meusanimes': (_) => MeusAnimesView(),
+        '/preferencias': (_) => PreferenciasView(),
+      },
     );
   }
 }

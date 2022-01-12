@@ -5,6 +5,7 @@ class Anime{
   String _estudio;
   String _diaSemana;
   int _episodios;
+  int _episodiosAssistidos;
   double _score;
   DateTime _dataLancamento;
   String _urlImagem;
@@ -44,6 +45,10 @@ class Anime{
   String get diaSemana => _diaSemana;
 
   set diaSemana(String value) => _diaSemana = value;
+
+  int get episodiosAssistidos => _episodiosAssistidos;
+
+  set episodiosAssistidos(int value) => _episodiosAssistidos = value;
   
   Anime.fromJson(Map<String, dynamic> json){
     _id = json['mal_id'];
@@ -51,11 +56,14 @@ class Anime{
     _urlImagem = json['image_url'];
     //_dataLancamento = json['airing_start'];
     _episodios = json['episodes'];
-    _score = json['score'];
+    _episodiosAssistidos = json['watched_episodes'];
+    //print(json['score']);
+    //_score = json['score'];
     //_estudio = json['producers'][0]['name'];
     _tipo = json['type'];
 
   }
+  
 
   /*Anime.fromJson(var dadosJson){
     _id = dadosJson["id"];

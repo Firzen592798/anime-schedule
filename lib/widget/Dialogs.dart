@@ -65,19 +65,15 @@ class Dialogs {
         false;
   }
 
-
-
-  static Future<String> setarUsuarioMAL(BuildContext context) async {
+  static Future<String> mostrarDialogUsuarioMal(BuildContext context) async {
+    String resultado;
     usuarioController.text = GlobalVar().usuarioMAL;
-    final action = await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Setar usuário do myanimelist'),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            content: Container(
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Digite seu nome de usuário do MyAnimeList"),
+          content: Container(
               height: 200.0,
               width: 200,
               child: Column(
@@ -93,25 +89,29 @@ class Dialogs {
                 ],
               ),
             ),
-            actions: [
-              TextButton (
-                onPressed: () => Navigator.of(context).pop(""),
-                child: const Text(
-                  'Cancelar',
-                  style: TextStyle(color: Colors.red),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          actions: <Widget>[
+            Row(
+              children: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(""),
+                  child: Text('Cancelar'),
                 ),
-              ),
-              SizedBox(
-                width: 95.0,
-              ),
-              TextButton (
-                
-                onPressed: () => Navigator.of(context).pop(usuarioController.text),
-                child: const Text('Confirmar'),
-              ),
-            ],
-          );
-        });
-    return (action != null) ? action : AcaoDialog.nao;
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(usuarioController.text),
+                  child: Text('Sim'),
+                )
+              ],
+            )
+          ],
+        );
+      },
+    ).then((value) {
+      resultado = value;
+    });
+    print(resultado);
+    return resultado;
   }
 }
