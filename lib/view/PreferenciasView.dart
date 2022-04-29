@@ -1,4 +1,7 @@
+import 'package:animeschedule/model/ConfigPrefs.dart';
+import 'package:animeschedule/service/LocalService.dart';
 import 'package:animeschedule/util/GlobalVar.dart';
+import 'package:animeschedule/util/Toasts.dart';
 import 'package:animeschedule/view/MeusAnimesView.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -17,13 +20,11 @@ class _PreferenciasViewState extends State<PreferenciasView> {
 
   @override
   void initState() {
-    SharedPreferences.getInstance().then((prefs) {
-      print(prefs.getInt("opcaoNotificacao") ?? 1);
+    LocalService().getConfigPrefs().then((configPrefs) => {
       setState(() {
-        this.opcaoSelecionada = prefs.getInt("opcaoNotificacao") ?? 1;
-        this.usuarioController.text = prefs.getString("usuarioMAL") ?? "";
-      });
-
+        this.opcaoSelecionada = configPrefs.opcaoNotificacao;
+        this.usuarioController.text = configPrefs.usuarioMAL;
+      })
     });
     super.initState();
   }
@@ -70,22 +71,13 @@ class _PreferenciasViewState extends State<PreferenciasView> {
               ),
               ElevatedButton(
                 onPressed: (){
-                  SharedPreferences.getInstance().then((prefs) {
-                    prefs.setString('usuarioMAL', usuarioController.text);
-                    GlobalVar().usuarioMAL = usuarioController.text;
-                    prefs.setInt('opcaoNotificacao', opcaoSelecionada);
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeusAnimesView()));
-                    //print("Setou usuarioMAL: "+response);
-                    Fluttertoast.showToast(
-                        msg: "Preferências atualizadas com sucesso",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.blue,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                  });
+                  ConfigPrefs configPrefs = ConfigPrefs();
+                  configPrefs.usuarioMAL = usuarioController.text;
+                  configPrefs.opcaoNotificacao = opcaoSelecionada;
+                  LocalService().salvarPrefs(configPrefs);
+                  GlobalVar().usuarioMAL = configPrefs.usuarioMAL;
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeusAnimesView()));
+                  Toasts.mostrarToast("Preferências atualizadas com sucesso");
                 }, 
                 child: Text("Salvar")
               )

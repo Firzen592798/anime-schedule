@@ -1,5 +1,6 @@
 import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/service/ApiService.dart';
+import 'package:animeschedule/service/LocalService.dart';
 import 'package:animeschedule/util/ApiResponse.dart';
 import 'package:animeschedule/util/GlobalVar.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
@@ -21,6 +22,8 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   List<String> listaDias = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
 
+  LocalService localService = LocalService();
+
   @override
   void initState() {
     super.initState();
@@ -29,12 +32,12 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
   }
 
   _carregarAnimes() async{
-    SharedPreferences.getInstance().then((prefs) async{
-      String usuarioMAL = prefs.getString("usuarioMAL") ?? "";
-      print("Usuario mal: "+usuarioMAL);
-      GlobalVar().usuarioMAL = usuarioMAL;
+    //GlobalVar().usuarioMAL = usuarioMAL;
+    String usuarioMAL = "";
+
       ApiResponse response = await _apiService.listarAnimesPorDia(diaSelecionado);
       if(!response.isError){
+        //Se tiver usuário do MAL logado, o código puxa a lista dos animes marcados como watching no mal
         if(usuarioMAL != ""){
           if(_listaAnimesUsuario == null){
             ApiResponse responseUsuario = await _apiService.listarAnimesUsuario(usuarioMAL);
@@ -44,8 +47,6 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
           }
           List<Anime> listaAnimesDia = response.data;
           _listaAnimes = [];
-          
-          //listaAnimesDia.forEach((animeDia) => {
           for(int j = 0; j < listaAnimesDia.length; j++){
             Anime animeDia = listaAnimesDia[j];
             for(int i = 0; i < _listaAnimesUsuario.length; i++){
@@ -55,12 +56,30 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
               }
             }
           }
-        }else{
+        }else{ //se não tiver usuário logado, puxa os animes do local storage que foram marcados como assistindo.
           _listaAnimes = response.data;
+          //Anime animeLocal;
+           List<int> listaAnimeLocal = await localService.getAnimes();
+          _listaAnimes.where((element) => element.id > 0).forEach((element) {
+            if(listaAnimeLocal.contains(element.id)){
+              element.marcado = true;
+            }
+          });
+         
         }
         setState(() {});
       }
-    });
+
+  }
+
+  _marcar(index){
+    _listaAnimes[index].marcado = true;
+    localService.adicionarMarcacaoAnime(_listaAnimes[index].id);
+  }
+
+  _desmarcar(index){
+    _listaAnimes[index].marcado = false;
+    localService.removerMarcacaoAnime(_listaAnimes[index].id);
   }
 
   @override
@@ -127,13 +146,37 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
     //final item = _listaTarefas[index]["titulo"];
     return  Container(
         child: ListTile(
-          
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children:  <Widget>[
+              !_listaAnimes[index].marcado ? 
+              IconButton(
+                icon: const Icon(Icons.star_outline),
+                tooltip: 'Marcar como Assistindo',
+                onPressed: () {
+                  setState(() {
+                    _marcar(index);
+                  });
+                },
+              ) : 
+              IconButton(
+                icon: const Icon(Icons.star),
+                tooltip: 'Remover marcação',
+                onPressed: () {
+                  setState(() {
+                    _desmarcar(index);
+                  });
+                },
+              )
+            ],
+          ),
           title: Text(_listaAnimes[index].titulo),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Último Assistido: ${_listaAnimes[index].episodiosAssistidos}"),
+            children:  <Widget>[
+              Text("Último Assistido: ${_listaAnimes[index].episodiosAssistidos == null ? "-" : _listaAnimes[index].episodiosAssistidos}"),
               Text(_listaAnimes[index].diaSemana),
+              
               /*Row(
                 children: [
                   Text(_listaAnimes[index].diaSemana),
@@ -144,7 +187,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
             ),
             
           
-          leading: Image.network(_listaAnimes[index].urlImagem, fit: BoxFit.fitHeight,)
+          leading: CircleAvatar(backgroundImage: NetworkImage(_listaAnimes[index].urlImagem)),
         )
 
     );

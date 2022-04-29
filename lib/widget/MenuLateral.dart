@@ -1,4 +1,5 @@
 import 'package:animeschedule/util/GlobalVar.dart';
+import 'package:animeschedule/view/LoginView.dart';
 import 'package:animeschedule/view/PreferenciasView.dart';
 import 'package:animeschedule/widget/Dialogs.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +46,13 @@ class _MenuLateralState extends State<MenuLateral> {
                 ),
               ))
             ]),
+          ),
+          ListTile(
+            title: Text('Autorizar MyAnimeList'),
+            onTap: () async{
+              Navigator.pop(context);
+              Navigator.push(context,MaterialPageRoute(builder: (context) => LoginView()));
+            },
           ),
           ListTile(
             title: Text('Preferências'),

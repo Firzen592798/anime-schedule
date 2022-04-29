@@ -9,6 +9,7 @@ class Anime{
   double _score;
   DateTime _dataLancamento;
   String _urlImagem;
+  bool _marcado;
 
   String get titulo => _titulo;
 
@@ -50,20 +51,29 @@ class Anime{
 
   set episodiosAssistidos(int value) => _episodiosAssistidos = value;
   
+  bool get marcado => this._marcado;
+
+  set marcado(bool _marcado) => this._marcado = _marcado;
+
   Anime.fromJson(Map<String, dynamic> json){
     _id = json['mal_id'];
     _titulo = json['title'];
     _urlImagem = json['image_url'];
-    //_dataLancamento = json['airing_start'];
     _episodios = json['episodes'];
     _episodiosAssistidos = json['watched_episodes'];
-    //print(json['score']);
-    //_score = json['score'];
-    //_estudio = json['producers'][0]['name'];
     _tipo = json['type'];
-
+    _marcado = false;
   }
-  
+
+  Map<String, dynamic> toJson() => {
+    'mal_id': _id,
+    'title': _titulo,
+    'image_url': _urlImagem,
+    'episodes': _episodios,
+    'watched_episodes': _episodiosAssistidos,
+    'type': _tipo,
+  };
+
 
   /*Anime.fromJson(var dadosJson){
     _id = dadosJson["id"];

@@ -32,7 +32,7 @@ dependencies:
   webview_flutter: 
   fluttertoast: 
   shared_preferences: 
-
+  flutter_inappwebview:
 dev_dependencies:
   flutter_test:
     sdk: flutter
