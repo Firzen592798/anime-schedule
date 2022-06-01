@@ -7,7 +7,7 @@ class Anime{
   int _episodios;
   int _episodiosAssistidos;
   double _score;
-  DateTime _dataLancamento;
+  String _broadcastTime;
   String _urlImagem;
   bool _marcado;
 
@@ -35,10 +35,6 @@ class Anime{
 
   set urlImagem(String value) => _urlImagem = value;
 
-  DateTime get dataLancamento => _dataLancamento;
-
-  set dataLancamento(DateTime value) => _dataLancamento = value;
-  
   String get estudio => _estudio;
 
   set estudio(String value) => _estudio = value;
@@ -55,12 +51,17 @@ class Anime{
 
   set marcado(bool _marcado) => this._marcado = _marcado;
 
+  String get broadcastTime => this._broadcastTime;
+
+  set broadcastTime(String _broadcastTime) => this._broadcastTime = _broadcastTime;
+ 
   Anime.fromJson(Map<String, dynamic> json){
     _id = json['mal_id'];
     _titulo = json['title'];
-    _urlImagem = json['image_url'];
-    _episodios = json['episodes'];
-    _episodiosAssistidos = json['watched_episodes'];
+    _urlImagem = json['images']['jpg']['image_url'] ?? "";
+    _broadcastTime =  json['broadcast']['time'] ?? "--:--";
+    _episodios = json['episodes'] ?? 0;
+    _episodiosAssistidos = json['watched_episodes']  ?? 0;
     _tipo = json['type'];
     _marcado = false;
   }

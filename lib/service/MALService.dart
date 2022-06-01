@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:animeschedule/model/Anime.dart';
-import 'package:animeschedule/util/ApiResponse.dart';
 import 'package:animeschedule/util/Properties.dart';
-import 'package:http/http.dart' as http;
 
 class MALService{
 

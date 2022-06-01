@@ -144,27 +144,22 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   Widget criarItem(context, index){
     //final item = _listaTarefas[index]["titulo"];
+    final isAnimeMarcado = _listaAnimes[index].marcado;
     return  Container(
         child: ListTile(
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children:  <Widget>[
-              !_listaAnimes[index].marcado ? 
               IconButton(
-                icon: const Icon(Icons.star_outline),
-                tooltip: 'Marcar como Assistindo',
+                icon: !isAnimeMarcado ? const Icon(Icons.star_outline) :  const Icon(Icons.star),
+                tooltip: !isAnimeMarcado ? 'Marcar como Assistindo' : 'Remover marcação',
                 onPressed: () {
                   setState(() {
-                    _marcar(index);
-                  });
-                },
-              ) : 
-              IconButton(
-                icon: const Icon(Icons.star),
-                tooltip: 'Remover marcação',
-                onPressed: () {
-                  setState(() {
-                    _desmarcar(index);
+                    if(!isAnimeMarcado){
+                      _marcar(index);
+                    }else{
+                      _desmarcar(index);
+                    }
                   });
                 },
               )
@@ -175,6 +170,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children:  <Widget>[
               Text("Último Assistido: ${_listaAnimes[index].episodiosAssistidos == null ? "-" : _listaAnimes[index].episodiosAssistidos}"),
+              Text(_listaAnimes[index].broadcastTime),
               Text(_listaAnimes[index].diaSemana),
               
               /*Row(

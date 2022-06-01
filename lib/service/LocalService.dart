@@ -1,10 +1,7 @@
-import 'dart:convert';
-
-import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/model/ConfigPrefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/**Service para gerenciar o armazenamento dos dados em local storage */
+/// Service para gerenciar o armazenamento dos dados em local storage 
 class LocalService{
   static final LocalService _singleton = LocalService._internal();
 
