@@ -1,4 +1,4 @@
-import 'package:animeschedule/service/ApiService.dart';
+import 'package:animeschedule/service/JikanApiService.dart';
 import 'package:flutter_test/flutter_test.dart';
 void main() {
   ApiService api = ApiService();

@@ -1,5 +1,5 @@
 import 'package:animeschedule/model/ConfigPrefs.dart';
-import 'package:animeschedule/service/LocalService.dart';
+import 'package:animeschedule/service/LocalDataService.dart';
 import 'package:animeschedule/util/GlobalVar.dart';
 import 'package:animeschedule/util/Toasts.dart';
 import 'package:animeschedule/view/MeusAnimesView.dart';
@@ -15,18 +15,63 @@ class PreferenciasView extends StatefulWidget {
 class _PreferenciasViewState extends State<PreferenciasView> {
 
   TextEditingController usuarioController = new TextEditingController();
-  List<String> opcoesNotificacao = ['Desabilitar todas', 'No início do dia', 'Quando sair o episódio'];
-  int opcaoSelecionada = 1;
+  List<String> opcoesNotificacao = ['Desabilitar todas', 'Horário fixo', 'Ao sair o episódio'];
+  int opcaoSelecionada = 0;
 
+  String dropdownNotificationTimeValue;
+  String dropdownTimeAfterEpisodeValue;
+  List<String> dropdownNotificationTimeListItems = new List<String>.generate(24, (index) => "$index:00");
+  List<String> dropdownTimeAfterEpisodeListItems = ["0", "30", "60", "90", "180"];
   @override
   void initState() {
     LocalService().getConfigPrefs().then((configPrefs) => {
       setState(() {
         this.opcaoSelecionada = configPrefs.opcaoNotificacao;
+        if(this.opcaoSelecionada > 0){
+          dropdownNotificationTimeValue = configPrefs.horarioNotificacao;
+          dropdownTimeAfterEpisodeValue = configPrefs.tempoAposOEpisodioParaDispararNotificacao;
+        }
         this.usuarioController.text = configPrefs.usuarioMAL;
       })
     });
     super.initState();
+  }
+
+  Widget switchDropdownNotificationTime(){
+    switch(opcaoSelecionada){       
+      case 1: 
+        return createDropdownNotificationTime(dropdownNotificationTimeListItems);
+        break;
+      case 2: 
+        return createDropdownNotificationTime(dropdownTimeAfterEpisodeListItems);
+        break;
+      default: 
+        return SizedBox.shrink();
+    }
+  }
+
+  Widget createDropdownNotificationTime(List<String> dropdownItems){
+    return DropdownButton<String>(
+      value: opcaoSelecionada == 1 ? dropdownNotificationTimeValue : dropdownTimeAfterEpisodeValue,
+      onChanged: (String newValue) {
+        setState(() {
+          print(newValue);
+          if( opcaoSelecionada == 1){
+            dropdownNotificationTimeValue = newValue;
+          }else{
+            dropdownTimeAfterEpisodeValue = newValue;
+          }
+         
+        });
+      },
+      items: dropdownItems
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
   }
 
   @override
@@ -65,17 +110,18 @@ class _PreferenciasViewState extends State<PreferenciasView> {
                 onChanged: (newVal) {
                   this.setState(() {
                     this.opcaoSelecionada = opcoesNotificacao.indexOf(newVal);
-                    print("Trocou: ${opcaoSelecionada}");
                   });
                 },
               ),
+              switchDropdownNotificationTime(),
               ElevatedButton(
                 onPressed: (){
                   ConfigPrefs configPrefs = ConfigPrefs();
                   configPrefs.usuarioMAL = usuarioController.text;
                   configPrefs.opcaoNotificacao = opcaoSelecionada;
+                  configPrefs.tempoAposOEpisodioParaDispararNotificacao = dropdownTimeAfterEpisodeValue;
+                  configPrefs.horarioNotificacao = dropdownNotificationTimeValue;
                   LocalService().salvarPrefs(configPrefs);
-                  GlobalVar().usuarioMAL = configPrefs.usuarioMAL;
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeusAnimesView()));
                   Toasts.mostrarToast("Preferências atualizadas com sucesso");
                 }, 

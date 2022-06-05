@@ -1,11 +1,10 @@
 import 'package:animeschedule/model/Anime.dart';
-import 'package:animeschedule/service/ApiService.dart';
-import 'package:animeschedule/service/LocalService.dart';
+import 'package:animeschedule/service/JikanApiService.dart';
+import 'package:animeschedule/service/LocalDataService.dart';
+import 'package:animeschedule/service/NotificationService.dart';
 import 'package:animeschedule/util/ApiResponse.dart';
-import 'package:animeschedule/util/GlobalVar.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MeusAnimesView extends StatefulWidget {
   @override
@@ -18,16 +17,21 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
   List<Anime> _listaAnimesUsuario;
   ApiService _apiService = ApiService();
 
-  int diaSelecionado = 0;
+  int selectedDay = 0;
 
-  List<String> listaDias = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
+  bool showOnlyMarkedAnimes = false;
+
+  List<String> listaDias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
   LocalService localService = LocalService();
+
+  NotificationService notificationService = NotificationService();
 
   @override
   void initState() {
     super.initState();
-    diaSelecionado = (DateTime.now().weekday - 1) % 7;
+    notificationService.showNotification();
+    selectedDay = (DateTime.now().weekday - 1) % 7;
     _carregarAnimes();
   }
 
@@ -35,7 +39,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
     //GlobalVar().usuarioMAL = usuarioMAL;
     String usuarioMAL = "";
 
-      ApiResponse response = await _apiService.listarAnimesPorDia(diaSelecionado);
+      ApiResponse response = await _apiService.listarAnimesPorDia(selectedDay);
       if(!response.isError){
         //Se tiver usuário do MAL logado, o código puxa a lista dos animes marcados como watching no mal
         if(usuarioMAL != ""){
@@ -88,42 +92,66 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Lista de animes"),
-        actions: [
-          Theme(
-            child: DropdownButton<String>(
-            items: listaDias.map((String value) {
-              return new DropdownMenuItem<String>(
-                value: value,
-                child: new Text(
-                  value,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
-                ),
-              );
-            }).toList(),
-            value: listaDias[diaSelecionado],
-            style: new TextStyle(
-              color: Colors.white,
-            ),
-            onChanged: (newVal) {
-              this.setState(() {
-                diaSelecionado = listaDias.indexOf(newVal);
-                _carregarAnimes();
-              });
-            },
-          ),
-          data: Theme.of(context).copyWith(
-            canvasColor: Colors.blue.shade200,
-          )
-          )
-        ],
       ),
       drawer: MenuLateral(context),
       body: Column(
         children: <Widget>[
-          Expanded(
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.amber,
+              border: Border.all(
+                color: Colors.blueGrey,
+                width: 1,
+              )
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            width: double.infinity,
+            height: 40,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                DropdownButton<String>(
+                  items: listaDias.map((String value) {
+                    return new DropdownMenuItem<String>(
+                      value: value,
+                      child: new Text(
+                        value,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  value: listaDias[selectedDay],
+                  style: new TextStyle(
+                    color: Colors.white,
+                  ),
+                  onChanged: (newVal) {
+                    this.setState(() {
+                      selectedDay = listaDias.indexOf(newVal);
+                      _carregarAnimes();
+                    });
+                  },
+                ),
+                Spacer(),
+                Text(
+                  "Mostrar somente animes marcados"
+                ),
+                Switch(
+                  value: showOnlyMarkedAnimes,
+                  onChanged: (value) {
+                    setState(() {
+                      showOnlyMarkedAnimes = value;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height-130,
             child: ListView.separated(
               itemCount: _listaAnimes.length,
               itemBuilder: criarItem,
@@ -143,50 +171,45 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
   
 
   Widget criarItem(context, index){
-    //final item = _listaTarefas[index]["titulo"];
-    final isAnimeMarcado = _listaAnimes[index].marcado;
-    return  Container(
-        child: ListTile(
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children:  <Widget>[
-              IconButton(
-                icon: !isAnimeMarcado ? const Icon(Icons.star_outline) :  const Icon(Icons.star),
-                tooltip: !isAnimeMarcado ? 'Marcar como Assistindo' : 'Remover marcação',
-                onPressed: () {
-                  setState(() {
-                    if(!isAnimeMarcado){
-                      _marcar(index);
-                    }else{
-                      _desmarcar(index);
-                    }
-                  });
-                },
-              )
-            ],
-          ),
-          title: Text(_listaAnimes[index].titulo),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children:  <Widget>[
-              Text("Último Assistido: ${_listaAnimes[index].episodiosAssistidos == null ? "-" : _listaAnimes[index].episodiosAssistidos}"),
-              Text(_listaAnimes[index].broadcastTime),
-              Text(_listaAnimes[index].diaSemana),
-              
-              /*Row(
-                children: [
-                  Text(_listaAnimes[index].diaSemana),
-                  //_listaAnimes[index].episodios.toString() != null ? Text("Episódios: "+_listaAnimes[index].episodios.toString()) : Text("Episódios: Não especificado"),
-                ],
-              ),*/
+      final isMarked = _listaAnimes[index].marcado;
+      if(isMarked || !showOnlyMarkedAnimes){
+        return  Container(
+          child: ListTile(
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children:  <Widget>[
+                IconButton(
+                  icon: !isMarked ? const Icon(Icons.star_outline) :  const Icon(Icons.star),
+                  tooltip: !isMarked ? 'Marcar como Assistindo' : 'Remover marcação',
+                  onPressed: () {
+                    setState(() {
+                      if(!isMarked){
+                        _marcar(index);
+                      }else{
+                        _desmarcar(index);
+                      }
+                    });
+                  },
+                )
               ],
             ),
+            title: Text(_listaAnimes[index].titulo),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children:  <Widget>[
+                Text("Último Assistido: ${_listaAnimes[index].episodiosAssistidos == null ? "-" : _listaAnimes[index].episodiosAssistidos}"),
+                Text(_listaAnimes[index].broadcastTime),
+                ],
+              ),
+              
             
-          
-          leading: CircleAvatar(backgroundImage: NetworkImage(_listaAnimes[index].urlImagem)),
-        )
+            leading: CircleAvatar(backgroundImage: NetworkImage(_listaAnimes[index].urlImagem)),
+          )
 
-    );
+        );
+    }else{
+      return SizedBox.shrink();
+    }
   }
 }
 

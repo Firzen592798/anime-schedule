@@ -67,7 +67,7 @@ class ApiService{
   List data;
 
   Future<String> loadJsonData() async {
-      var jsonText = await rootBundle.loadString('schedule.json');
+      var jsonText = await rootBundle.loadString('assets/schedule.json');
       return jsonText;
   }
 
@@ -126,9 +126,9 @@ class ApiService{
 
   bool verifyIfIsAnimeInSelectedDay(int selectedDay, String broadcastDay, String broadcastTime){
     try{
-    int dayDiff = getDiffOfDaysBetweenSelectedAndBroadcastDay(broadcastTime);
-    String correctedBroadcastDay = _diasSemanaListaCapitalized[(selectedDay - dayDiff) % 7];
-    return correctedBroadcastDay == broadcastDay;
+      int dayDiff = getDiffOfDaysBetweenSelectedAndBroadcastDay(broadcastTime);
+      String correctedBroadcastDay = _diasSemanaListaCapitalized[(selectedDay - dayDiff) % 7];
+      return correctedBroadcastDay == broadcastDay;
     }catch(e){
       return false;
     }
@@ -136,16 +136,14 @@ class ApiService{
   }
 
   Future<ApiResponse> listarAnimesPorDia(diaSelecionado) async{
-    print("Dia selecionado: "+diaSelecionado.toString());
     String dia = _diasSemanaLista[diaSelecionado];
-    //String url = Properties.URL_API_CONSULTA + "/schedules?dia="+dia;    
+    //String url = Properties.URL_API_CONSULTA + "/schedules?limit=4000";
+    //var jsonBruto = await loadFromURL(url);
     var jsonBruto = await loadJsonData();
     var dadosJson = json.decode(jsonBruto);
     ApiResponse apiResponse;
-      print('Abriu o json');
       List<Anime> lista = [];
       for (var item in dadosJson["data"]) {
-        print("Convertendo JSON");
         if(item['broadcast']['time'] != null){
           String correctBroadcastTime = getCorrectedBroadcastTime(item['broadcast']['time']);
           if(verifyIfIsAnimeInSelectedDay(diaSelecionado, item['broadcast']['day'], item['broadcast']['time'])){

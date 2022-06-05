@@ -47,13 +47,13 @@ class _MenuLateralState extends State<MenuLateral> {
               ))
             ]),
           ),
-          ListTile(
+          /*ListTile(
             title: Text('Autorizar MyAnimeList'),
             onTap: () async{
               Navigator.pop(context);
               Navigator.push(context,MaterialPageRoute(builder: (context) => LoginView()));
             },
-          ),
+          ),*/
           ListTile(
             title: Text('Preferências'),
             onTap: () async{

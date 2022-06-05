@@ -3,7 +3,11 @@ import 'package:animeschedule/view/MeusAnimesView.dart';
 import 'package:animeschedule/view/PreferenciasView.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+import 'service/NotificationService.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().initPlugin();
   runApp(MyApp());
 }
 
@@ -16,7 +20,7 @@ class MyApp extends StatelessWidget {
       home: MeusAnimesView(),
             routes: {
         //'/test': (_) => SearchTest(),
-        '/login': (_) => LoginView(),
+        //'/login': (_) => LoginView(),
         '/meusanimes': (_) => MeusAnimesView(),
         '/preferencias': (_) => PreferenciasView(),
       },
