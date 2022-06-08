@@ -1,5 +1,6 @@
 import 'package:animeschedule/model/ConfigPrefs.dart';
-import 'package:animeschedule/service/LocalDataService.dart';
+import 'package:animeschedule/service/LocalStorageService.dart';
+import 'package:animeschedule/service/SchedulerService.dart';
 import 'package:animeschedule/util/GlobalVar.dart';
 import 'package:animeschedule/util/Toasts.dart';
 import 'package:animeschedule/view/MeusAnimesView.dart';
@@ -24,7 +25,7 @@ class _PreferenciasViewState extends State<PreferenciasView> {
   List<String> dropdownTimeAfterEpisodeListItems = ["0", "30", "60", "90", "180"];
   @override
   void initState() {
-    LocalService().getConfigPrefs().then((configPrefs) => {
+    LocalStorageService().getConfigPrefs().then((configPrefs) => {
       setState(() {
         this.opcaoSelecionada = configPrefs.opcaoNotificacao;
         if(this.opcaoSelecionada > 0){
@@ -121,7 +122,10 @@ class _PreferenciasViewState extends State<PreferenciasView> {
                   configPrefs.opcaoNotificacao = opcaoSelecionada;
                   configPrefs.tempoAposOEpisodioParaDispararNotificacao = dropdownTimeAfterEpisodeValue;
                   configPrefs.horarioNotificacao = dropdownNotificationTimeValue;
-                  LocalService().salvarPrefs(configPrefs);
+                  LocalStorageService().salvarPrefs(configPrefs);
+                  if(configPrefs.opcaoNotificacao == 1){
+                    SchedulerService().schedule();
+                  }
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeusAnimesView()));
                   Toasts.mostrarToast("Preferências atualizadas com sucesso");
                 }, 

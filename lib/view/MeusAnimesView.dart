@@ -1,10 +1,12 @@
 import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/service/JikanApiService.dart';
-import 'package:animeschedule/service/LocalDataService.dart';
+import 'package:animeschedule/service/LocalStorageService.dart';
 import 'package:animeschedule/service/NotificationService.dart';
 import 'package:animeschedule/util/ApiResponse.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
+
+import '../model/LocalNotification.dart';
 
 class MeusAnimesView extends StatefulWidget {
   @override
@@ -23,24 +25,24 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   List<String> listaDias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
-  LocalService localService = LocalService();
+  LocalStorageService localService = LocalStorageService();
 
   NotificationService notificationService = NotificationService();
 
   @override
-  void initState() {
+  initState() {
     super.initState();
-    notificationService.showNotification();
+    
     selectedDay = (DateTime.now().weekday - 1) % 7;
-    _carregarAnimes();
+    _apiService.initializeAnimeListInMemory().then((value) => _carregarAnimes());
   }
 
   _carregarAnimes() async{
     //GlobalVar().usuarioMAL = usuarioMAL;
     String usuarioMAL = "";
 
-      ApiResponse response = await _apiService.listarAnimesPorDia(selectedDay);
-      if(!response.isError){
+      List<Anime> dailyAnimeList = await _apiService.findAllByDay(selectedDay);
+    
         //Se tiver usuário do MAL logado, o código puxa a lista dos animes marcados como watching no mal
         if(usuarioMAL != ""){
           if(_listaAnimesUsuario == null){
@@ -49,10 +51,11 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
               _listaAnimesUsuario = responseUsuario.data;
             }
           }
-          List<Anime> listaAnimesDia = response.data;
           _listaAnimes = [];
-          for(int j = 0; j < listaAnimesDia.length; j++){
-            Anime animeDia = listaAnimesDia[j];
+          
+          for(int j = 0; j < dailyAnimeList.length; j++){
+            Anime animeDia = dailyAnimeList[j];
+            
             for(int i = 0; i < _listaAnimesUsuario.length; i++){
               if(_listaAnimesUsuario[i].id == animeDia.id){               
                 _listaAnimes.add(animeDia);
@@ -61,24 +64,23 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
             }
           }
         }else{ //se não tiver usuário logado, puxa os animes do local storage que foram marcados como assistindo.
-          _listaAnimes = response.data;
-          //Anime animeLocal;
-           List<int> listaAnimeLocal = await localService.getAnimes();
-          _listaAnimes.where((element) => element.id > 0).forEach((element) {
-            if(listaAnimeLocal.contains(element.id)){
+          List<Anime> favoriteAnimeList = await localService.getMarkedAnimes();
+          dailyAnimeList.where((element) => element.id > 0).forEach((element) {
+            if(favoriteAnimeList.contains(element)){
               element.marcado = true;
             }
           });
-         
+          setState(() {
+            _listaAnimes = dailyAnimeList;
+          });
+          notificationService.showNotification(LocalNotification.from(2,null));
+          //notificationService.showNotification(LocalNotification.from(0, _listaAnimes.where((element) => element.marcado == true).toList()));
         }
-        setState(() {});
-      }
-
   }
 
   _marcar(index){
     _listaAnimes[index].marcado = true;
-    localService.adicionarMarcacaoAnime(_listaAnimes[index].id);
+    localService.adicionarMarcacaoAnime(_listaAnimes[index]);
   }
 
   _desmarcar(index){
@@ -198,7 +200,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children:  <Widget>[
                 Text("Último Assistido: ${_listaAnimes[index].episodiosAssistidos == null ? "-" : _listaAnimes[index].episodiosAssistidos}"),
-                Text(_listaAnimes[index].broadcastTime),
+                Text(_listaAnimes[index].correctBroadcastTime),
                 ],
               ),
               

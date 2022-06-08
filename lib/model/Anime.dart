@@ -1,13 +1,18 @@
 class Anime{
+  
+  static final List<String> diasSemanaListaCapitalized = [ "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays"]; 
+  
   int _id;
   String _titulo;
   String _tipo;
   String _estudio;
-  String _diaSemana;
+  String _correctBroadcastDay;
+  String _broadcastDayApi;
   int _episodios;
   int _episodiosAssistidos;
   double _score;
-  String _broadcastTime;
+  String _broadcastTimeApi;
+  String _correctBroadcastTime;
   String _urlImagem;
   bool _marcado;
 
@@ -39,9 +44,13 @@ class Anime{
 
   set estudio(String value) => _estudio = value;
 
-  String get diaSemana => _diaSemana;
+  get broadcastDayApi => this._broadcastDayApi;
 
-  set diaSemana(String value) => _diaSemana = value;
+  set broadcastDayApi( value) => this._broadcastDayApi = value;
+
+  get broadcastTimeApi => this._broadcastTimeApi;
+
+  set broadcastTimeApi( value) => this._broadcastTimeApi = value;
 
   int get episodiosAssistidos => _episodiosAssistidos;
 
@@ -51,18 +60,37 @@ class Anime{
 
   set marcado(bool _marcado) => this._marcado = _marcado;
 
-  String get broadcastTime => this._broadcastTime;
+  get correctBroadcastDay => this._correctBroadcastDay;
 
-  set broadcastTime(String _broadcastTime) => this._broadcastTime = _broadcastTime;
+  set correctBroadcastDay( value) => this._correctBroadcastDay = value;
+
+  get correctBroadcastTime => this._correctBroadcastTime;
+
+  set correctBroadcastTime( value) => this._correctBroadcastTime = value;
  
+  Anime(){}
+
   Anime.fromJson(Map<String, dynamic> json){
-    _id = json['mal_id'];
-    _titulo = json['title'];
+    _id = json['mal_id'] ?? 0;
+    _titulo = json['title'] ?? "";
     _urlImagem = json['images']['jpg']['image_url'] ?? "";
-    _broadcastTime =  json['broadcast']['time'] ?? "--:--";
+    _broadcastTimeApi =  json['broadcast']['time'] ?? "--:--";
+    _broadcastDayApi =  json['broadcast']['day'] ?? "";
     _episodios = json['episodes'] ?? 0;
     _episodiosAssistidos = json['watched_episodes']  ?? 0;
-    _tipo = json['type'];
+    _tipo = json['type'] ?? "";
+    _marcado = false;
+  }
+
+  Anime.fromJsonLocal(Map<String, dynamic> json){
+    _id = json['mal_id'] ?? 0;
+    _titulo = json['title'] ?? "";
+    _urlImagem = json['image_url'] ?? "";
+    _episodios = json['episodes'] ?? 0;
+    _episodiosAssistidos = json['watched_episodes']  ?? 0;
+    _correctBroadcastDay = json['correct_broadcast_day'] ?? "";
+    _correctBroadcastTime = json['correct_broadcast_time'] ?? "";
+    _tipo = json['type'] ?? "";
     _marcado = false;
   }
 
@@ -72,9 +100,10 @@ class Anime{
     'image_url': _urlImagem,
     'episodes': _episodios,
     'watched_episodes': _episodiosAssistidos,
+    'correct_broadcast_day': _correctBroadcastDay,
+    'correct_broadcast_time': _correctBroadcastTime,
     'type': _tipo,
   };
-
 
   /*Anime.fromJson(var dadosJson){
     _id = dadosJson["id"];

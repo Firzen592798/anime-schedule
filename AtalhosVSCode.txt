@@ -1,0 +1,12 @@
+ctrl + ; = comenta linha
+ctrl + B = fecha e abre aba
+Ctrl + H = Replace All
+ctrl + D = seleciona todas as variaeis
+shift + alt + baixo = duplicca a linha
+alt + cima ou baixo = troca a linha de lugar
+ctrl + L = selecina linha
+Alt + Numero = vai para a aba
+Ctrl + PgUp ou PgDw = navega sequencialmente nas abas
+Ctrl + G = vai para uma linha específica do código
+Ctrl + ] = Divide a tela em duas
+Ctrl + O = Abre diretório

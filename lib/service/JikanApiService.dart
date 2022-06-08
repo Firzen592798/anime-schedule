@@ -1,6 +1,7 @@
 import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/util/ApiResponse.dart';
 import 'package:animeschedule/util/Properties.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
@@ -12,10 +13,15 @@ class ApiService{
   }
   static final ApiService _singleton = ApiService._internal();
 
-  static final Map _diasSemana = {"monday": "Segunda", "tuesday": "Terça", "wednesday": "Quarta", "thursday": "Quinta", "friday": "Sexta", "saturday": "Sábado", "sunday": "Domingo", }; 
-  static final List<String> _diasSemanaLista = [ "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]; 
-  static final List<String> _diasSemanaListaCapitalized = [ "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays"]; 
   ApiService._internal();
+  
+  static final Map _diasSemana = {"monday": "Segunda", "tuesday": "Terça", "wednesday": "Quarta", "thursday": "Quinta", "friday": "Sexta", "saturday": "Sábado", "sunday": "Domingo", }; 
+  
+  static final List<String> _diasSemanaLista = [ "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]; 
+  
+  static final List<String> _diasSemanaListaCapitalized = [ "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays"]; 
+  
+  List<Anime> animeListInMemory;
 
   listarAnimesUsuario(usuarioMal) async{
     String url = Properties.URL_API_CONSULTA + "/user/"+usuarioMal+"/animelist/watching";    
@@ -36,35 +42,6 @@ class ApiService{
     }
 
   }
-
-  /*Future<ApiResponse> listarAnimesPorDia(diaSelecionado) async{
-    print("Dia selecionado: "+diaSelecionado.toString());
-    String url = Properties.URL_API_CONSULTA + "/schedules";    
-    print(url);
-    http.Response response = await http.get(
-      url,
-    );
-    print(response.statusCode);
-
-    ApiResponse apiResponse;
-    if (response.statusCode == 200) {
-      var dadosJson = json.decode(response.body);
-      print('Abriu o json');
-      List<Anime> lista = [];
-      String dia = _diasSemanaLista[diaSelecionado];
-      for (var item in dadosJson[dia]) {
-        Anime anime = Anime.fromJson(item);
-        anime.diaSemana = _diasSemana[dia];
-        lista.add(anime);
-      }
-      
-      apiResponse = ApiResponse<List<Anime>>(data: lista, isError: false);
-    }
-    print(apiResponse.isError);
-    return apiResponse;
-  }*/
-
-  List data;
 
   Future<String> loadJsonData() async {
       var jsonText = await rootBundle.loadString('assets/schedule.json');
@@ -132,35 +109,35 @@ class ApiService{
     }catch(e){
       return false;
     }
-    
   }
 
-  Future<ApiResponse> listarAnimesPorDia(diaSelecionado) async{
-    String dia = _diasSemanaLista[diaSelecionado];
+  Future<void> initializeAnimeListInMemory() async {
     //String url = Properties.URL_API_CONSULTA + "/schedules?limit=4000";
     //var jsonBruto = await loadFromURL(url);
     var jsonBruto = await loadJsonData();
     var dadosJson = json.decode(jsonBruto);
-    ApiResponse apiResponse;
-      List<Anime> lista = [];
-      for (var item in dadosJson["data"]) {
-        if(item['broadcast']['time'] != null){
-          String correctBroadcastTime = getCorrectedBroadcastTime(item['broadcast']['time']);
-          if(verifyIfIsAnimeInSelectedDay(diaSelecionado, item['broadcast']['day'], item['broadcast']['time'])){
-            Anime anime = Anime.fromJson(item);
-            anime.diaSemana = _diasSemana[dia];
-            anime.broadcastTime = correctBroadcastTime;
-            lista.add(anime);
-          }
-        }
-        //DateTime.now().timeZoneName;
-        //DateTime.parse("2022-10-10 10:00:00Z-10:00");
+    animeListInMemory = [];
+    for (var item in dadosJson["data"]) {
+      if(item['broadcast']['time'] != null){
+        Anime anime = Anime.fromJson(item);
+        animeListInMemory.add(anime);
       }
-      lista.sort((a, b) {
-        return a.broadcastTime.compareTo(b.broadcastTime);
-      },);
-      apiResponse = ApiResponse<List<Anime>>(data: lista, isError: false);
-    
-    return apiResponse;
+    }
+  }
+
+  List<Anime> findAllByDay(selectedDay){
+    List<Anime> dailyAnimeList = [];
+    animeListInMemory.forEach((element) {
+      if(verifyIfIsAnimeInSelectedDay(selectedDay, element.broadcastDayApi, element.broadcastTimeApi)){
+        Anime anime = element;
+        anime.correctBroadcastTime = getCorrectedBroadcastTime(element.broadcastTimeApi);
+        anime.correctBroadcastDay = _diasSemana[selectedDay];
+        dailyAnimeList.add(anime);
+      }
+    });
+    dailyAnimeList.sort((a, b) {
+      return a.correctBroadcastTime.compareTo(b.correctBroadcastTime);
+    },);
+    return dailyAnimeList;
   }
 }
