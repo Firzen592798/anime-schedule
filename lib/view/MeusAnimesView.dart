@@ -6,8 +6,6 @@ import 'package:animeschedule/util/ApiResponse.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 
-import '../model/LocalNotification.dart';
-
 class MeusAnimesView extends StatefulWidget {
   @override
   _MeusAnimesViewState createState() => _MeusAnimesViewState();
@@ -73,8 +71,6 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
           setState(() {
             _listaAnimes = dailyAnimeList;
           });
-          notificationService.showNotification(LocalNotification.from(2,null));
-          //notificationService.showNotification(LocalNotification.from(0, _listaAnimes.where((element) => element.marcado == true).toList()));
         }
   }
 

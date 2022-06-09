@@ -9,19 +9,11 @@ import 'package:flutter/material.dart';
 
 import 'service/NotificationService.dart';
 
-void printHello() {
-  final DateTime now = DateTime.now();
-  final int isolateId = Isolate.current.hashCode;
-  print("[$now] Hello, world! isolate=${isolateId} function='$printHello'");
-}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().initPlugin();
-  final int helloAlarmID = 0;
-  await AndroidAlarmManager.initialize();
+  
   runApp(MyApp());
-  LocalNotification lf = LocalNotification({"id": 1, "title": "Title", "body": "Body"});
-  await AndroidAlarmManager.periodic(const Duration(minutes: 1), helloAlarmID, () => { NotificationService().showNotification(lf)});
 }
 
 class MyApp extends StatelessWidget {

@@ -124,7 +124,9 @@ class _PreferenciasViewState extends State<PreferenciasView> {
                   configPrefs.horarioNotificacao = dropdownNotificationTimeValue;
                   LocalStorageService().salvarPrefs(configPrefs);
                   if(configPrefs.opcaoNotificacao == 1){
-                    SchedulerService().schedule();
+                    SchedulerService().scheduleFixedTimeOfDay(configPrefs.horarioNotificacao);
+                  }else{
+                    SchedulerService().cancelAll();
                   }
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeusAnimesView()));
                   Toasts.mostrarToast("Preferências atualizadas com sucesso");

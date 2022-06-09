@@ -15,12 +15,6 @@ class ApiService{
 
   ApiService._internal();
   
-  static final Map _diasSemana = {"monday": "Segunda", "tuesday": "Terça", "wednesday": "Quarta", "thursday": "Quinta", "friday": "Sexta", "saturday": "Sábado", "sunday": "Domingo", }; 
-  
-  static final List<String> _diasSemanaLista = [ "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]; 
-  
-  static final List<String> _diasSemanaListaCapitalized = [ "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays"]; 
-  
   List<Anime> animeListInMemory;
 
   listarAnimesUsuario(usuarioMal) async{
@@ -104,7 +98,7 @@ class ApiService{
   bool verifyIfIsAnimeInSelectedDay(int selectedDay, String broadcastDay, String broadcastTime){
     try{
       int dayDiff = getDiffOfDaysBetweenSelectedAndBroadcastDay(broadcastTime);
-      String correctedBroadcastDay = _diasSemanaListaCapitalized[(selectedDay - dayDiff) % 7];
+      String correctedBroadcastDay = Anime.diasSemanaListaCapitalized[(selectedDay - dayDiff) % 7];
       return correctedBroadcastDay == broadcastDay;
     }catch(e){
       return false;
@@ -131,7 +125,7 @@ class ApiService{
       if(verifyIfIsAnimeInSelectedDay(selectedDay, element.broadcastDayApi, element.broadcastTimeApi)){
         Anime anime = element;
         anime.correctBroadcastTime = getCorrectedBroadcastTime(element.broadcastTimeApi);
-        anime.correctBroadcastDay = _diasSemana[selectedDay];
+        anime.correctBroadcastDay = Anime.diasSemanaMap[selectedDay];
         dailyAnimeList.add(anime);
       }
     });

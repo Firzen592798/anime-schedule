@@ -1,5 +1,9 @@
 class Anime{
   
+  static final Map diasSemanaMap = {"monday": "Segunda", "tuesday": "Terça", "wednesday": "Quarta", "thursday": "Quinta", "friday": "Sexta", "saturday": "Sábado", "sunday": "Domingo", }; 
+
+  static final List<String> diasSemanaLista = [ "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]; 
+  
   static final List<String> diasSemanaListaCapitalized = [ "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays"]; 
   
   int _id;
@@ -110,4 +114,14 @@ class Anime{
     _idUsuarioAPI = dadosJson["idUsuarioAPI"];
     _urlFotoAPI = dadosJson["usuario"]["urlFotoAPI"];
   }*/
+  
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other))
+      return true;
+    if (other.runtimeType != runtimeType)
+      return false;
+    return other is Anime
+        && other.id == id;
+  }
 }
