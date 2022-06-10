@@ -37,17 +37,23 @@ dependencies:
   flutter_local_notifications: ^9.6.0
   timezone: ^0.8.0
   flutter_native_timezone: ^2.0.0
-  android_alarm_manager_plus: 2.0.5
+  android_alarm_manager_plus: ^2.0.5
 
 dev_dependencies:
   flutter_launcher_icons: "^0.9.2"
+  flutter_native_splash: 
   flutter_test:
     sdk: flutter
 
 flutter_icons:
   android: "launcher_icon"
-  ios: true
-  image_path: "assets/icon/icon.png"
+  image_path: "assets/icon.png"
+#flutter packages pub run flutter_launcher_icons:main
+
+flutter_native_splash:
+  image: "assets/splash.png"
+  color: "#ffffff"
+#flutter pub pub run flutter_native_splash:create
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

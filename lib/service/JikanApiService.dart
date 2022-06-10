@@ -23,7 +23,6 @@ class ApiService{
     ApiResponse apiResponse;
     if (response.statusCode == 200) {
       var dadosJson = json.decode(response.body);
-      print(dadosJson);
       List<Anime> lista = [];
       for (var item in dadosJson['anime']) {
         //print(item);
@@ -105,7 +104,7 @@ class ApiService{
     }
   }
 
-  Future<void> initializeAnimeListInMemory() async {
+  Future<void> loadJsonAnimeDataListInMemory() async {
     //String url = Properties.URL_API_CONSULTA + "/schedules?limit=4000";
     //var jsonBruto = await loadFromURL(url);
     var jsonBruto = await loadJsonData();
@@ -125,7 +124,7 @@ class ApiService{
       if(verifyIfIsAnimeInSelectedDay(selectedDay, element.broadcastDayApi, element.broadcastTimeApi)){
         Anime anime = element;
         anime.correctBroadcastTime = getCorrectedBroadcastTime(element.broadcastTimeApi);
-        anime.correctBroadcastDay = Anime.diasSemanaMap[selectedDay];
+        anime.correctBroadcastDay = Anime.diasSemanaListaCapitalized[selectedDay];
         dailyAnimeList.add(anime);
       }
     });

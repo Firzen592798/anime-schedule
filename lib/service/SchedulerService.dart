@@ -4,7 +4,6 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:animeschedule/model/LocalNotification.dart';
 import 'package:animeschedule/service/LocalStorageService.dart';
 import 'package:animeschedule/service/NotificationService.dart';
-import 'package:flutter/material.dart';
 
 NotificationService notificationService = NotificationService();
 
@@ -15,8 +14,9 @@ const fixedTimeScheduledId = 777;
 void rearrangeNotifications() {
   print("Iniciando notificação");
   int weekday = DateTime.now().weekday - 1;
+  print(weekday);
   localService.getMarkedAnimesByDay(weekday).then(((animeList) {
-    notificationService.showNotification(LocalNotification.from(weekday, animeList));
+    notificationService.showNotification(LocalNotification.from(animeList));
   }));
 }
 
@@ -46,10 +46,11 @@ class SchedulerService{
       startDate = startDate.add(Duration(days: 1));
     }
     AndroidAlarmManager.periodic(
-      const Duration(hours: 24), //Do the same every 24 hours
-      fixedTimeScheduledId, //Different ID for each alarm
+      const Duration(hours: 24),
+      fixedTimeScheduledId, 
       rearrangeNotifications,
-      startAt: startDate, 
+      startAt: DateTime.now().add(Duration(seconds: 10)), 
+      //startAt: startDate, 
       allowWhileIdle: true,
    );
    print("Agendado para "+startDate.toString());

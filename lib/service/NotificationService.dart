@@ -42,7 +42,7 @@ class NotificationService{
       priority: Priority.high,
       ticker: 'ticker',
       styleInformation: BigTextStyleInformation(''),
-      fullScreenIntent: true);
+      fullScreenIntent: false);
   }
 
   void selectNotification(String payload) async {

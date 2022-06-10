@@ -3,10 +3,10 @@
    <application
         android:label="animeschedule"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/launcher_icon"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"

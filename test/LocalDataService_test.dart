@@ -11,6 +11,8 @@ void main() {
     Anime anime = Anime();
     anime.id = id;
     anime.titulo = title;
+    anime.correctBroadcastDay ="Mondays";
+    anime.correctBroadcastTime = "08:00";
     return anime;
   }
 
@@ -29,7 +31,7 @@ void main() {
         "watched_episodes": 1,
         "correct_broadcast_day": i <= 2 ? "Mondays" : "Sundays",
         "correct_broadcast_time": "08:00",
-        "type": null
+        "type": "type"
       };
       initialStringList.add(jsonEncode(initialAnimeMap).toString());
     }
@@ -46,6 +48,9 @@ void main() {
         print(animeList.toString());
         Anime addedAnime = Anime.fromJsonLocal(jsonDecode(animeList[0]));
         expect(addedAnime.id, 1);
+        expect(addedAnime.correctBroadcastDay, "Mondays");
+        expect(addedAnime.correctBroadcastTime, "08:00");
+        
       });
     });
 

@@ -11,13 +11,13 @@ class LocalNotification {
     this.timeOfDay,
   });
 
-  LocalNotification.from(int weekday, List<Anime> animes){
+  LocalNotification.from(List<Anime> animes){
     String texto = "";
     if(animes != null)
       animes.forEach((element) {
         texto+="\n"+element.titulo +" - "+element.correctBroadcastTime;
       });
-    id = weekday;
+    id = DateTime.now().millisecondsSinceEpoch;
     title = "Segue a lista dos episódios do dia";
     body = texto;
   }
