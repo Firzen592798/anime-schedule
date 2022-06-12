@@ -6,8 +6,6 @@ import 'package:animeschedule/util/ApiResponse.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 
-import '../model/LocalNotification.dart';
-
 class MeusAnimesView extends StatefulWidget {
   @override
   _MeusAnimesViewState createState() => _MeusAnimesViewState();
@@ -17,7 +15,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   List<Anime> _listaAnimes = [];
   List<Anime> _listaAnimesUsuario;
-  ApiService _apiService = ApiService();
+  JikanApiService _apiService = JikanApiService();
 
   int selectedDay = 0;
 
@@ -32,10 +30,8 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
   @override
   initState() {
     super.initState();
-    
     selectedDay = (DateTime.now().weekday - 1) % 7;
-    _apiService.loadJsonAnimeDataListInMemory().then((value) => _carregarAnimes());
-
+    _carregarAnimes();
   }
 
   _carregarAnimes() async{
@@ -43,7 +39,6 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
     String usuarioMAL = "";
 
       List<Anime> dailyAnimeList = await _apiService.findAllByDay(selectedDay);
-        
         //Se tiver usuário do MAL logado, o código puxa a lista dos animes marcados como watching no mal
         if(usuarioMAL != ""){
           if(_listaAnimesUsuario == null){

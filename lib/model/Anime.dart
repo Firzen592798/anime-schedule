@@ -1,4 +1,4 @@
-class Anime{
+class Anime implements Comparable<Anime>{
   
   static final Map diasSemanaMap = {"monday": "Segunda", "tuesday": "Terça", "wednesday": "Quarta", "thursday": "Quinta", "friday": "Sexta", "saturday": "Sábado", "sunday": "Domingo", }; 
 
@@ -10,13 +10,15 @@ class Anime{
   String _titulo;
   String _tipo;
   String _estudio;
-  String _correctBroadcastDay;
+  String _broadcastTimeApi;
   String _broadcastDayApi;
+  String _broadcastEndApi;
   int _episodios;
   int _episodiosAssistidos;
   double _score;
-  String _broadcastTimeApi;
+  String _correctBroadcastDay;
   String _correctBroadcastTime;
+  DateTime _correctBroadcastEnd;
   String _urlImagem;
   bool _marcado;
 
@@ -48,11 +50,11 @@ class Anime{
 
   set estudio(String value) => _estudio = value;
 
-  get broadcastDayApi => this._broadcastDayApi;
+  String get broadcastDayApi => this._broadcastDayApi;
 
   set broadcastDayApi( value) => this._broadcastDayApi = value;
 
-  get broadcastTimeApi => this._broadcastTimeApi;
+  String get broadcastTimeApi => this._broadcastTimeApi;
 
   set broadcastTimeApi( value) => this._broadcastTimeApi = value;
 
@@ -64,14 +66,22 @@ class Anime{
 
   set marcado(bool _marcado) => this._marcado = _marcado;
 
-  get correctBroadcastDay => this._correctBroadcastDay;
+  String get correctBroadcastDay => this._correctBroadcastDay;
 
   set correctBroadcastDay( value) => this._correctBroadcastDay = value;
 
-  get correctBroadcastTime => this._correctBroadcastTime;
+  String get correctBroadcastTime => this._correctBroadcastTime;
 
   set correctBroadcastTime( value) => this._correctBroadcastTime = value;
  
+  String get broadcastEndApi => this._broadcastEndApi;
+
+  set broadcastEndApi( value) => this._broadcastEndApi = value;
+
+  DateTime  get correctBroadcastEnd => this._correctBroadcastEnd;
+
+  set correctBroadcastEnd( value) => this._correctBroadcastEnd = value;
+
   Anime(){}
 
   Anime.fromJson(Map<String, dynamic> json){
@@ -80,6 +90,7 @@ class Anime{
     _urlImagem = json['images']['jpg']['image_url'] ?? "";
     _broadcastTimeApi =  json['broadcast']['time'] ?? "--:--";
     _broadcastDayApi =  json['broadcast']['day'] ?? "";
+    _broadcastEndApi =  json['aired']['to'] ?? "";
     _episodios = json['episodes'] ?? 0;
     _episodiosAssistidos = json['watched_episodes']  ?? 0;
     _tipo = json['type'] ?? "";
@@ -92,6 +103,7 @@ class Anime{
     _urlImagem = json['image_url'] ?? "";
     _episodios = json['episodes'] ?? 0;
     _episodiosAssistidos = json['watched_episodes']  ?? 0;
+    _correctBroadcastEnd =  json['correct_broadcast_end'] == null ? null : DateTime.parse(json['correct_broadcast_end']);
     _correctBroadcastDay = json['correct_broadcast_day'] ?? "";
     _correctBroadcastTime = json['correct_broadcast_time'] ?? "";
     _tipo = json['type'] ?? "";
@@ -104,6 +116,7 @@ class Anime{
     'image_url': _urlImagem,
     'episodes': _episodios,
     'watched_episodes': _episodiosAssistidos,
+    'correct_broadcast_end': _correctBroadcastEnd.toIso8601String(),
     'correct_broadcast_day': _correctBroadcastDay,
     'correct_broadcast_time': _correctBroadcastTime,
     'type': _tipo,
@@ -124,4 +137,11 @@ class Anime{
     return other is Anime
         && other.id == id;
   }
+  
+  @override
+  int compareTo(Anime other) {
+    return this.correctBroadcastTime.compareTo(other.correctBroadcastTime);
+  }
+
+
 }

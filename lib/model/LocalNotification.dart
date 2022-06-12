@@ -12,12 +12,15 @@ class LocalNotification {
   });
 
   LocalNotification.from(List<Anime> animes){
+    DateTime now = DateTime.now();
+    String idStr ="${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
     String texto = "";
     if(animes != null)
       animes.forEach((element) {
         texto+="\n"+element.titulo +" - "+element.correctBroadcastTime;
       });
-    id = DateTime.now().millisecondsSinceEpoch;
+    
+    id = int.parse(idStr);
     title = "Segue a lista dos episódios do dia";
     body = texto;
   }

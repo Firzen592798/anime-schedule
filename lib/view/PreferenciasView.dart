@@ -16,7 +16,8 @@ class PreferenciasView extends StatefulWidget {
 class _PreferenciasViewState extends State<PreferenciasView> {
 
   TextEditingController usuarioController = new TextEditingController();
-  List<String> opcoesNotificacao = ['Desabilitar todas', 'Horário fixo', 'Ao sair o episódio'];
+  List<String> opcoesNotificacao = ['Desabilitar todas', 'Notificação de novos episódios todos os dias'];
+  //List<String> opcoesNotificacao = ['Desabilitar todas', 'Horário fixo', 'Ao sair o episódio'];
   int opcaoSelecionada = 0;
 
   String dropdownNotificationTimeValue;

@@ -1,12 +1,25 @@
 import 'package:animeschedule/service/JikanApiService.dart';
 import 'package:flutter_test/flutter_test.dart';
 void main() {
-  ApiService api = ApiService();
+  JikanApiService api = JikanApiService();
+
   group('timeDiffToJapan', () {
      test('Cenário normal', () {
        expect(api.getTimezoneDiffToJapan(), -12);
 
      });
+  });
+
+  group('getCorrectedBroadcastEnd', () {
+      test('Espera-se que o dia corrigido pela timezone fique 24 no horário 23:59', () {
+        DateTime dt = api.getCorrectedBroadcastEnd("2022-06-25T00:00:00+00:00", "11:59");
+        expect(dt.day, 24);
+     });
+
+      test('Espera-se que o dia corrigido pela timezone continue 25 no horário 0:00', () {
+          DateTime dt = api.getCorrectedBroadcastEnd("2022-06-25T00:00:00+00:00", "12:00");
+          expect(dt.day, 25);
+      });
   });
   
   group('getDiffOfDaysBetweenSelectedAndBroadcastDay', () {
