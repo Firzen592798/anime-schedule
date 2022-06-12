@@ -1,8 +1,3 @@
-import 'dart:isolate';
-
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:animeschedule/model/LocalNotification.dart';
-import 'package:animeschedule/view/LoginView.dart';
 import 'package:animeschedule/view/MeusAnimesView.dart';
 import 'package:animeschedule/view/PreferenciasView.dart';
 import 'package:flutter/material.dart';

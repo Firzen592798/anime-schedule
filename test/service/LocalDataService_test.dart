@@ -13,6 +13,7 @@ void main() {
     anime.titulo = title;
     anime.correctBroadcastDay ="Mondays";
     anime.correctBroadcastTime = "08:00";
+    anime.correctBroadcastEnd = DateTime(2022, 6, 6);
     return anime;
   }
 
@@ -50,7 +51,9 @@ void main() {
         expect(addedAnime.id, 1);
         expect(addedAnime.correctBroadcastDay, "Mondays");
         expect(addedAnime.correctBroadcastTime, "08:00");
-        
+        expect(addedAnime.correctBroadcastEnd.day, 6);
+        expect(addedAnime.correctBroadcastEnd.month, 6);
+        expect(addedAnime.correctBroadcastEnd.year, 2022);
       });
     });
 
