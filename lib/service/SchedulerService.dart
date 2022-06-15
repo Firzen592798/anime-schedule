@@ -5,9 +5,6 @@ import 'package:animeschedule/service/LocalStorageService.dart';
 import 'package:animeschedule/service/NotificationService.dart';
 import '../model/Anime.dart';
 
-
-
-
 class SchedulerService{
 
   final fixedTimeScheduledId = 777;
