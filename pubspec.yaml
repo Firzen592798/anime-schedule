@@ -55,7 +55,11 @@ flutter_icons:
 flutter_native_splash:
   image: "assets/splash.png"
   color: "#ffffff"
+  android: false
+  ios: false
+  
 #flutter pub pub run flutter_native_splash:create
+#flutter pub pub run flutter_native_splash:remove
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

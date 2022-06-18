@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
 
+import '../model/AnimeDetails.dart';
+
 class JikanApiService{
   
   factory JikanApiService() {
@@ -17,8 +19,6 @@ class JikanApiService{
   List<Anime> animeListInMemory = [];
 
   List<bool> isDayLoaded = [false, false, false, false, false, false, false];
-
-  http.Client client;
 
   listarAnimesUsuario(usuarioMal) async{
 
@@ -50,12 +50,16 @@ class JikanApiService{
   }
 
   Future<String> loadFromURL(String url, [http.Client clientMock]) async{
+    http.Response response;
     if(clientMock != null){
-      client = clientMock;
+      response = await clientMock.get(
+        Uri.parse(url),
+      );
+    }else{
+      response = await http.get(
+        Uri.parse(url),
+      );
     }
-    http.Response response = await client.get(
-      Uri.parse(url),
-    );
     if(response.statusCode == 200){
       return response.body;
     }else{
@@ -179,12 +183,14 @@ class JikanApiService{
     return dailyAnimeList;
   }
 
-  Future<Anime> loadAnimeDetails(int malId, [http.Client http]) async {
+  Future<Anime> loadAnimeDetails(Anime anime, [http.Client http]) async {
     //Anime anime = ;
-    String url = Properties.URL_API_CONSULTA + "/anime/$malId/full";
+    String url = Properties.URL_API_CONSULTA + "/anime/${anime.id}/full";
     String loadedData = await loadFromURL(url, http);
     var dadosJson = json.decode(loadedData);
-    Anime anime = Anime.fromJson(dadosJson);
+    anime.animeDetails = AnimeDetails.fromJson(dadosJson);
+    print("carregou dados");
+    print(anime.animeDetails.genres.toString());
     return anime;
   }
 }

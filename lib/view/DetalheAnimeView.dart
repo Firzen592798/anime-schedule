@@ -3,6 +3,8 @@ import 'package:animeschedule/service/JikanApiService.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 
+import '../service/LocalStorageService.dart';
+
 class DetalheAnimeView extends StatefulWidget {
 
   final Anime anime;
@@ -17,37 +19,48 @@ class _DetalheAnimeViewState extends State<DetalheAnimeView> {
 
   JikanApiService jikanApiService = JikanApiService();
 
-  Anime anime;
+  LocalStorageService localService = LocalStorageService();
 
-  _carregarDetalhes() async {
-    anime = await jikanApiService.loadAnimeDetails(widget.anime.id);
-  }
+  Anime anime;
 
   @override
   Future<void> initState() {
     anime = widget.anime;
-    _carregarDetalhes();
+    
+    jikanApiService.loadAnimeDetails(anime).then((value) {
+      setState(() {
+         anime = value;
+         print("sinopse ${anime.animeDetails.synopsis}");
+      });
+     
+    });
     super.initState();
+  }
 
+  voltar(){
+    Navigator.pop(context);
+  }
+
+  _marcar(){
+    anime.marcado = true;
+    localService.adicionarMarcacaoAnime(anime);
+  }
+
+  _desmarcar(){
+    anime.marcado = false;
+    localService.removerMarcacaoAnime(anime.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    Anime anime = widget.anime;
     return Scaffold(
       appBar: AppBar(
         title: Text("Detalhes do anime"),
       ),
       drawer: MenuLateral(context),
-      body: Card(
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              alignment: Alignment.center,
-              child: Image(
-                image: NetworkImage(anime.urlImagem),
-              ),
-            ),
             ListTile(
               title: Text(
                 anime.titulo,
@@ -59,34 +72,103 @@ class _DetalheAnimeViewState extends State<DetalheAnimeView> {
                   fontSize: 20,
                 ),
               ),
+              trailing: IconButton(
+                  icon: !anime.marcado ? const Icon(Icons.star_outline) :  const Icon(Icons.star),
+                  tooltip: !anime.marcado ? 'Marcar como Assistindo' : 'Remover marcação',
+                  onPressed: () {
+                    setState(() {
+                      if(!anime.marcado){
+                        _marcar();
+                      }else{
+                        _desmarcar();
+                      }
+                    });
+                  },
+                ),
+            ),
+            SizedBox(
+              //alignment: Alignment.center,
+              width: double.infinity,
+              
+              height: 300,
+              child: anime.animeDetails != null ? Image(
+                image: NetworkImage(anime.urlImagem),
+              ) : SizedBox.shrink(),
             ),
             
-            ListTile(
+            1 == 1 ? SizedBox.shrink(): ListTile(
+              leading: Icon(Icons.tv_outlined),
               title: Text(
-                anime.episodios ?? "Indefinido"
+                "Número de episódios: "+ anime.episodios.toString()
               ),
             ),
+
             ListTile(
+              leading: Icon(Icons.access_alarm_outlined),
               title: Text(
-                "Transmissão de 24/02/2022 a 24/05/2022 (Terças às 10:00)"
+                "Transmissão nas ${anime.correctBroadcastDay} às ${anime.correctBroadcastTime}"
               ),
             ),
-            ListTile(
+            anime.animeDetails != null ? ListTile(
+              leading: Icon(Icons.info_outline),
               title: Text(
-                anime?.animeDetails?.synopsis
+                anime?.animeDetails?.synopsis,
+                textAlign: TextAlign.justify,
               ),
-            ),
-            ListTile(
+            ) :SizedBox.shrink() ,
+            anime.animeDetails != null ? ListTile(
+              leading: Icon(Icons.extension_outlined),
               title: Text(
-                "Gêneros: Drama, Slice of Life, Romance"
+                "Gêneros: "+anime.animeDetails.genres.join(", ")
               ),
-            ),
-            ListTile(
+            ) : SizedBox.shrink(),
+            anime.animeDetails != null ? ListTile(
+              leading: Icon(Icons.business_outlined),
               title: Text(
-                "Estúdio: MAPPA"
+                "Estúdios: "+anime.animeDetails.studios.join(", ")
               ),
-            ),
-      
+            ) : SizedBox.shrink(),
+
+            anime.animeDetails != null ? ListTile(
+              leading: Icon(Icons.music_video_outlined),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Aberturas"),
+                  Text(
+                    anime.animeDetails.openings.join("\n"),
+                    style: TextStyle(
+                      height: 1.7,
+                      fontSize: 12
+                    ),
+                  ),
+                ],
+              ),
+            ) : SizedBox.shrink(),
+
+            anime.animeDetails != null ? ListTile(
+              leading: Icon(Icons.music_note_outlined),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Encerramentos"),
+                  Text(
+                    anime.animeDetails.endings.join("\n"),
+                    style: TextStyle(
+                      height: 1.7,
+                      fontSize: 12
+                    ),
+                  ),
+                ],
+              ),
+            ) : SizedBox.shrink(),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16),
+              child: ElevatedButton(onPressed: voltar, 
+                child: Text("Voltar")
+              ),
+            )
           ]
       
         ),

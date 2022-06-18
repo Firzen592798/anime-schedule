@@ -23,7 +23,8 @@ class Anime implements Comparable<Anime>{
   DateTime _correctBroadcastEnd;
   String _urlImagem;
   bool _marcado;
-  AnimeDetails _animeDetails = null;
+  
+  AnimeDetails _animeDetails;
 
   AnimeDetails get animeDetails => this._animeDetails;
 
@@ -96,11 +97,6 @@ class Anime implements Comparable<Anime>{
   }
   
   Anime.fromJson(Map<String, dynamic> json){
-    bool detailed = false;
-    if(json['data'] != null){
-      json = json['data'];
-      detailed = true;
-    }
     _id = json['mal_id'] ?? 0;
     _titulo = json['title'] ?? "";
     _urlImagem = json['images']['jpg']['image_url'] ?? "";
@@ -111,13 +107,6 @@ class Anime implements Comparable<Anime>{
     _episodiosAssistidos = json['watched_episodes']  ?? 0;
     _tipo = json['type'] ?? "";
     _marcado = false;
-    if(detailed){
-      _animeDetails = AnimeDetails();
-      _animeDetails.synopsis = json['synopsis'];
-      _animeDetails.urlImagemGrande = json['images']['jpg']['large_image_url'];
-      _animeDetails.genres = (json['genres'] as List).map((e) => e['name'] as String).toList();
-      _animeDetails.studios = (json['studios'] as List).map((e) => e['name'] as String).toList();
-    }
   }
 
   Anime.fromJsonLocal(Map<String, dynamic> json){
@@ -139,7 +128,7 @@ class Anime implements Comparable<Anime>{
     'image_url': _urlImagem,
     'episodes': _episodios,
     'watched_episodes': _episodiosAssistidos,
-    'correct_broadcast_end': _correctBroadcastEnd.toIso8601String(),
+    'correct_broadcast_end':_correctBroadcastEnd != null ? _correctBroadcastEnd.toIso8601String() : null,
     'correct_broadcast_day': _correctBroadcastDay,
     'correct_broadcast_time': _correctBroadcastTime,
     'type': _tipo,

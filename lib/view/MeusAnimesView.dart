@@ -7,6 +7,8 @@ import 'package:animeschedule/view/DetalheAnimeView.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 
+import '../widget/AnimeListItem.dart';
+
 class MeusAnimesView extends StatefulWidget {
   @override
   _MeusAnimesViewState createState() => _MeusAnimesViewState();
@@ -73,19 +75,17 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
         }
   }
 
-  _marcar(index){
-    _listaAnimes[index].marcado = true;
-    localService.adicionarMarcacaoAnime(_listaAnimes[index]);
+  _marcar(Anime anime){
+    localService.adicionarMarcacaoAnime(anime);
   }
 
-  _desmarcar(index){
-    _listaAnimes[index].marcado = false;
-    localService.removerMarcacaoAnime(_listaAnimes[index].id);
+  _desmarcar(Anime anime){
+    localService.removerMarcacaoAnime(anime.id);
   }
 
   _showDetailsPage(index){
-   
-    Navigator.push(context,  MaterialPageRoute(builder: (context) => DetalheAnimeView(anime: _listaAnimes[index])));
+    print("showDetailsPage ${_listaAnimes[index].titulo}");
+    //Navigator.push(context,  MaterialPageRoute(builder: (context) => DetalheAnimeView(anime: _listaAnimes[index])));
   }
 
 
@@ -157,7 +157,17 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
             height: MediaQuery.of(context).size.height-130,
             child: ListView.separated(
               itemCount: _listaAnimes.length,
-              itemBuilder: criarItem,
+              itemBuilder: (BuildContext context, int index) {
+                return (_listaAnimes[index].marcado || !showOnlyMarkedAnimes) ? GestureDetector(
+                  onTap: _showDetailsPage(index),
+                  child: AnimeListItem(
+                    index: index,
+                    anime: _listaAnimes[index],
+                    desmarcarAnime: _desmarcar,
+                    marcarAnime: _marcar,
+                  ),
+                ): SizedBox.shrink();
+              },
               separatorBuilder: (context, index) {
                 return Divider(
                   indent: 0,
@@ -165,6 +175,15 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
                 );
               },
             ),
+          ),
+          SizedBox(
+            height: 30,
+            width: double.infinity,
+            child: Container(
+              alignment: Alignment.center,
+              color: Colors.amber,
+              child: Text("Desenvolvido por Firzen592798")
+            )
           )
         ],
       ),
@@ -176,8 +195,11 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
   Widget criarItem(context, index){
       final isMarked = _listaAnimes[index].marcado;
       if(isMarked || !showOnlyMarkedAnimes){
-        return  Container(
+        return  SizedBox(
+          height: 100,
+          width: double.infinity,
           child: ListTile(
+            dense:true,            
             onTap: () => _showDetailsPage(index),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -201,13 +223,32 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children:  <Widget>[
-                Text("Último Assistido: ${_listaAnimes[index].episodiosAssistidos == null ? "-" : _listaAnimes[index].episodiosAssistidos}"),
                 Text(_listaAnimes[index].correctBroadcastTime),
+                Text("EncheLinguica"),
+                Text("EncheLinguica"),
+                Text("EncheLinguica"),
                 ],
               ),
               
             
-            leading: CircleAvatar(backgroundImage: NetworkImage(_listaAnimes[index].urlImagem)),
+            // leading: FittedBox(
+            //   fit: BoxFit.fill,
+            //   child: CircleAvatar(
+            //     radius: 100,
+            //     backgroundColor: Colors.amber,
+            //   ),
+            // ),
+            
+            leading: Image(
+              alignment: Alignment.center,
+              height: 200,
+              width: 200,
+              fit: BoxFit.fill,
+              image: NetworkImage(_listaAnimes[index].urlImagem)
+            ),
+            
+            
+            
           )
 
         );

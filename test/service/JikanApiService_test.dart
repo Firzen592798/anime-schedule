@@ -6,7 +6,6 @@ void main() {
   group('timeDiffToJapan', () {
      test('Cenário normal', () {
        expect(api.getTimezoneDiffToJapan(), -12);
-
      });
   });
 
