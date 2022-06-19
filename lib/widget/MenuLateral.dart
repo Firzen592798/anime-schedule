@@ -1,12 +1,7 @@
-import 'package:animeschedule/util/GlobalVar.dart';
-import 'package:animeschedule/view/LoginView.dart';
 import 'package:animeschedule/view/PreferenciasView.dart';
-import 'package:animeschedule/widget/Dialogs.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class MenuLateral extends StatefulWidget {  
-
+class MenuLateral extends StatefulWidget {
   final dynamic contextTelaPrincipal;
   MenuLateral(this.contextTelaPrincipal);
 
@@ -17,7 +12,8 @@ class MenuLateral extends StatefulWidget {
 class _MenuLateralState extends State<MenuLateral> {
   TextEditingController usuarioController = TextEditingController();
 
-  String url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfeBf-Hc33XkfWZdbRpvxHYgbKaW9Gogn7qA&usqp=CAU";
+  String url =
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfeBf-Hc33XkfWZdbRpvxHYgbKaW9Gogn7qA&usqp=CAU";
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +29,12 @@ class _MenuLateralState extends State<MenuLateral> {
               CircleAvatar(
                 radius: 40,
                 backgroundColor: Colors.grey[200],
-                backgroundImage:url == null
-                    ? null
-                    : NetworkImage(url),
+                backgroundImage: url == null ? null : NetworkImage(url),
               ),
               SizedBox(width: 16),
               Flexible(
-                child: Text('Header',
+                  child: Text(
+                'Header',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -56,9 +51,10 @@ class _MenuLateralState extends State<MenuLateral> {
           ),*/
           ListTile(
             title: Text('Preferências'),
-            onTap: () async{
+            onTap: () async {
               Navigator.pop(context);
-              Navigator.push(context,MaterialPageRoute(builder: (context) => PreferenciasView()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PreferenciasView()));
             },
           ),
           ListTile(

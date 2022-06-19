@@ -1,6 +1,6 @@
 import 'package:animeschedule/model/Anime.dart';
-import 'package:animeschedule/util/ApiResponse.dart';
-import 'package:animeschedule/util/Properties.dart';
+import 'package:animeschedule/core/ApiResponse.dart';
+import 'package:animeschedule/core/Properties.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';

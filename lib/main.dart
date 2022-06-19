@@ -1,3 +1,4 @@
+import 'package:animeschedule/themes/AppTheme.dart';
 import 'package:animeschedule/view/MeusAnimesView.dart';
 import 'package:animeschedule/view/PreferenciasView.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: AppTheme().themedata,
       debugShowCheckedModeBanner: false,
       home: MeusAnimesView(),
             routes: {

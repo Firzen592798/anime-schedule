@@ -1,4 +1,4 @@
-import 'package:animeschedule/util/GlobalVar.dart';
+import 'package:animeschedule/core/GlobalVar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,7 +21,7 @@ class Dialogs {
           title: Text(title),
           content: Text(body),
           actions: <Widget>[
-            TextButton (
+            TextButton(
               onPressed: () => Navigator.of(context).pop(AcaoDialog.nao),
               child: const Text('Não'),
             ),
@@ -48,11 +48,11 @@ class Dialogs {
             title: new Text('Aviso'),
             content: new Text('Deseja sair do aplicativo'),
             actions: <Widget>[
-              new TextButton (
+              new TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
                 child: new Text('Não'),
               ),
-              new TextButton (
+              new TextButton(
                 onPressed: () {
                   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
                 },
@@ -74,21 +74,20 @@ class Dialogs {
         return AlertDialog(
           title: Text("Digite seu nome de usuário do MyAnimeList"),
           content: Container(
-              height: 200.0,
-              width: 200,
-              child: Column(
-                children: [
-                  TextField(
-                    controller: usuarioController,
-                    decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
-                        labelText: 'Digite o seu nome do usuário',
-                        labelStyle: TextStyle(color: Colors.black)),
-                  ),
-
-                ],
-              ),
+            height: 200.0,
+            width: 200,
+            child: Column(
+              children: [
+                TextField(
+                  controller: usuarioController,
+                  decoration: InputDecoration(
+                      border: UnderlineInputBorder(),
+                      labelText: 'Digite o seu nome do usuário',
+                      labelStyle: TextStyle(color: Colors.black)),
+                ),
+              ],
             ),
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -100,7 +99,8 @@ class Dialogs {
                   child: Text('Cancelar'),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(usuarioController.text),
+                  onPressed: () =>
+                      Navigator.of(context).pop(usuarioController.text),
                   child: Text('Sim'),
                 )
               ],

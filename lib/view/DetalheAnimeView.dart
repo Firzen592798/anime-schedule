@@ -1,5 +1,6 @@
 import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/service/JikanApiService.dart';
+import 'package:animeschedule/themes/AppTheme.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 

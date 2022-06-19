@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:animeschedule/util/Properties.dart';
+import 'package:animeschedule/core/Properties.dart';
 
 class MALService{
 

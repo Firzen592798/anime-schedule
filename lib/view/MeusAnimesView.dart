@@ -1,13 +1,13 @@
+import 'package:animeschedule/core/ApiResponse.dart';
 import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/service/JikanApiService.dart';
 import 'package:animeschedule/service/LocalStorageService.dart';
 import 'package:animeschedule/service/NotificationService.dart';
-import 'package:animeschedule/util/ApiResponse.dart';
-import 'package:animeschedule/view/DetalheAnimeView.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 
 import '../widget/AnimeListItem.dart';
+import 'DetalheAnimeView.dart';
 
 class MeusAnimesView extends StatefulWidget {
   @override
@@ -85,7 +85,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   _showDetailsPage(index){
     print("showDetailsPage ${_listaAnimes[index].titulo}");
-    //Navigator.push(context,  MaterialPageRoute(builder: (context) => DetalheAnimeView(anime: _listaAnimes[index])));
+    Navigator.push(context,  MaterialPageRoute(builder: (context) => DetalheAnimeView(anime: _listaAnimes[index])));
   }
 
 
@@ -101,42 +101,38 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
         children: <Widget>[
           Container(
             decoration: BoxDecoration(
-              color: Colors.amber,
+              color: Colors.teal[100],
               border: Border.all(
-                color: Colors.blueGrey,
+                color: Colors.black,
                 width: 1,
               )
             ),
             padding: EdgeInsets.symmetric(horizontal: 16),
             width: double.infinity,
-            height: 40,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 DropdownButton<String>(
-                  items: listaDias.map((String value) {
-                    return new DropdownMenuItem<String>(
-                      value: value,
-                      child: new Text(
-                        value,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
+                    underline: SizedBox.shrink(),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    items: listaDias.map((String value) {
+                      return new DropdownMenuItem<String>(
+                        value: value,
+                        child: new Text(
+                          value,
+                          style: Theme.of(context).textTheme.subtitle1,
                         ),
-                      ),
-                    );
-                  }).toList(),
-                  value: listaDias[selectedDay],
-                  style: new TextStyle(
-                    color: Colors.white,
+                      );
+                    }).toList(),
+                    value: listaDias[selectedDay],
+                    onChanged: (newVal) {
+                      this.setState(() {
+                        selectedDay = listaDias.indexOf(newVal);
+                        _carregarAnimes();
+                      });
+                    },
                   ),
-                  onChanged: (newVal) {
-                    this.setState(() {
-                      selectedDay = listaDias.indexOf(newVal);
-                      _carregarAnimes();
-                    });
-                  },
-                ),
                 Spacer(),
                 Text(
                   "Mostrar somente animes marcados"
@@ -159,7 +155,8 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
               itemCount: _listaAnimes.length,
               itemBuilder: (BuildContext context, int index) {
                 return (_listaAnimes[index].marcado || !showOnlyMarkedAnimes) ? GestureDetector(
-                  onTap: _showDetailsPage(index),
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _showDetailsPage(index),
                   child: AnimeListItem(
                     index: index,
                     anime: _listaAnimes[index],
@@ -176,15 +173,6 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
               },
             ),
           ),
-          SizedBox(
-            height: 30,
-            width: double.infinity,
-            child: Container(
-              alignment: Alignment.center,
-              color: Colors.amber,
-              child: Text("Desenvolvido por Firzen592798")
-            )
-          )
         ],
       ),
     );
@@ -200,7 +188,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
           width: double.infinity,
           child: ListTile(
             dense:true,            
-            onTap: () => _showDetailsPage(index),
+            
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children:  <Widget>[
@@ -223,10 +211,10 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children:  <Widget>[
-                Text(_listaAnimes[index].correctBroadcastTime),
-                Text("EncheLinguica"),
-                Text("EncheLinguica"),
-                Text("EncheLinguica"),
+                Text(
+                  _listaAnimes[index].correctBroadcastTime,
+                  style: Theme.of(context).textTheme.subtitle1,
+                ),
                 ],
               ),
               

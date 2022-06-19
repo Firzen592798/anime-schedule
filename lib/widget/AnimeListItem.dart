@@ -4,7 +4,8 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
-import '../model/Anime.dart';
+import '../../model/Anime.dart';
+import '../themes/AppTheme.dart';
 
 class AnimeListItem extends StatefulWidget {
 
@@ -49,18 +50,36 @@ class _AnimeListItemState extends State<AnimeListItem> {
     return  Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
+          Container(
             padding: const EdgeInsets.all(8.0),
-            child: Image(
-              alignment: Alignment.center,
-              height: 80,
-              width: 80,
-              isAntiAlias: true,
-              fit: BoxFit.cover,
-              image: NetworkImage(widget.anime.urlImagem)
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 1,
+                ),
+              ),
+              child: Image(
+                alignment: Alignment.center,
+                height: 80,
+                width: 80,
+                isAntiAlias: true,
+                fit: BoxFit.cover,
+                image: NetworkImage(widget.anime.urlImagem)
+              ),
             ),
           ),
-          Expanded(child: Text(widget.anime.titulo)),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.anime.titulo),
+                  Text(widget.anime.correctBroadcastTime, style: AppTheme().themedata.textTheme.bodySmall,),
+                ],
+              ),
+            )
+          ),
           IconButton(
             icon: !widget.anime.marcado ? const Icon(Icons.star_outline) :  const Icon(Icons.star),
             tooltip: !widget.anime.marcado ? 'Marcar como Assistindo' : 'Remover marcação',
