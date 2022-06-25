@@ -1,9 +1,11 @@
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:animeschedule/model/LocalNotification.dart';
-import 'package:animeschedule/service/JikanApiService.dart';
-import 'package:animeschedule/service/LocalStorageService.dart';
-import 'package:animeschedule/service/NotificationService.dart';
+import 'package:animeschedule/core/LocalNotification.dart';
+import 'package:animeschedule/service-impl/JikanApiService.dart';
+import 'package:animeschedule/service-impl/LocalStorageService.dart';
+import 'package:animeschedule/service-impl/NotificationService.dart';
+import 'package:animeschedule/service/IAnimeApiService.dart';
 import '../model/Anime.dart';
+import '../service/ILocalStorageService.dart';
 
 class SchedulerService{
 
@@ -11,9 +13,9 @@ class SchedulerService{
 
   final dailyUpdateScheduledId = 999;
 
-  LocalStorageService localService = LocalStorageService();
+  ILocalStorageService localService = LocalStorageService();
 
-  JikanApiService jikanApiService = JikanApiService();
+  IAnimeAPiService jikanApiService = JikanApiService();
 
   NotificationService notificationService = NotificationService();
 
@@ -25,7 +27,7 @@ class SchedulerService{
     return _singleton;
   }
 
-  void rearrangeNotifications() {
+  void doRearrangeNotifications() {
     print("Iniciando notificação");
     int weekday = DateTime.now().weekday - 1;
     print(weekday);
@@ -36,7 +38,6 @@ class SchedulerService{
     }));
   }
 
-  ///Fazer uma rotina de teste para esse carinha aqui
   Future<int> doRemoveMarksOfFinishedAnimes([DateTime dateNow]) async{
     if(dateNow == null){
       dateNow = DateTime.now();
@@ -57,6 +58,17 @@ class SchedulerService{
       });
     }
     return qtdRemovidos;
+  }
+
+  void doUpdateEndBroadcastOfLocalData([DateTime dateNow]) async{
+    List<Anime> remoteAnimeData = await jikanApiService.fetchJsonDatafromFile();
+    List<Anime> localAnimeData = await localService.getMarkedAnimes();
+    
+    localAnimeData.where((element) => element.correctBroadcastEnd != null);
+    localAnimeData.where((element) => element.correctBroadcastEnd != null).forEach((element) {
+      
+    });
+
   }
 
   Future<DateTime> scheduleFixedTimeOfDay(String timeOfDay, [DateTime dateNow]) async {
@@ -80,7 +92,7 @@ class SchedulerService{
     AndroidAlarmManager.periodic(
       const Duration(hours: 24),
       fixedTimeScheduledId, 
-      rearrangeNotifications,
+      doRearrangeNotifications,
       startAt: startDate, 
       allowWhileIdle: true,
    );

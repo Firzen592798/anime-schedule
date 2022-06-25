@@ -1,14 +1,20 @@
 import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/core/ApiResponse.dart';
 import 'package:animeschedule/core/Properties.dart';
-import 'package:http/http.dart' as http;
+import 'package:animeschedule/service/IAnimeApiService.dart';
+import 'package:http/http.dart' show Client, Response;
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
 
-import '../model/AnimeDetails.dart';
+import '../domain/AnimeDetails.dart';
 
-class JikanApiService{
+class JikanApiService implements IAnimeAPiService{
   
+  //http.Client _httpClient;
+  Client _httpClient = Client();
+
+  set httpClient(Client mock) => this._httpClient = mock;
+
   factory JikanApiService() {
     return _singleton;
   }
@@ -18,13 +24,12 @@ class JikanApiService{
   
   List<Anime> animeListInMemory = [];
 
-  List<bool> isDayLoaded = [false, false, false, false, false, false, false];
+  List<bool> _isDayLoaded = [false, false, false, false, false, false, false];
 
-  listarAnimesUsuario(usuarioMal) async{
+  Future<ApiResponse<List<Anime>>> listarAnimesUsuario(usuarioMal) async{
 
     String url = Properties.URL_API_CONSULTA + "/user/"+usuarioMal+"/animelist/watching";    
-    http.Response response = await http.get(Uri.parse(url));
-    ApiResponse apiResponse;
+    Response response = await _httpClient.get(Uri.parse(url));
     if (response.statusCode == 200) {
       var dadosJson = json.decode(response.body);
       List<Anime> lista = [];
@@ -33,33 +38,33 @@ class JikanApiService{
         Anime anime = Anime.fromJson(item);
         lista.add(anime);
       }
-      
-      apiResponse = ApiResponse<List<Anime>>(data: lista, isError: false);
-      return apiResponse;
+      return ApiResponse<List<Anime>>(data: lista, isError: false);
+    }else{
+      return ApiResponse<List<Anime>>(data: null, isError: true, errorMessage: "Erro ao recuperar os animes");
     }
-
   }
 
-  Future<void> loadJsonDatafromFile() async {
-      if(isDayLoaded.lastIndexWhere((element) => element == true) == -1){
-        var jsonText = await rootBundle.loadString('assets/schedule.json');
-        animeListInMemory =  _parseJsonAnimeData(jsonText);
-        isDayLoaded = [true, true, true, true, true, true, true];
+  Future<List<Anime>> fetchJsonDatafromFile() async {
+      var jsonText = await rootBundle.loadString('assets/schedule.json');
+      List<Anime> animes =  _parseJsonAnimeData(jsonText);
+      return animes;
+  }
+
+  Future<void> _loadJsonDatafromFile() async {
+      if(_isDayLoaded.every((element) => element == false)){ 
+        animeListInMemory =  await fetchJsonDatafromFile();
+        _isDayLoaded = [true, true, true, true, true, true, true];
       }
       return;
   }
 
-  Future<String> loadFromURL(String url, [http.Client clientMock]) async{
-    http.Response response;
-    if(clientMock != null){
-      response = await clientMock.get(
-        Uri.parse(url),
-      );
-    }else{
-      response = await http.get(
-        Uri.parse(url),
-      );
-    }
+  Future<String> loadFromURL(String url) async{
+    Response response;
+
+    response = await _httpClient.get(
+      Uri.parse(url),
+    );
+    
     if(response.statusCode == 200){
       return response.body;
     }else{
@@ -69,27 +74,36 @@ class JikanApiService{
 
   ///Para carregamento dos dados da API de forma eficiente, esse método considera a diferença de fuso horário e faz a busca pela URL
   ///no dia corrente e também no dia adjacente
-  Future<void> loadJsonDataByWeekday(int weekday, [http.Client clientMock]) async{
+  Future<void> loadJsonDataByWeekday(int weekday) async{
     List<Anime> animeData = [];
-    if(!isDayLoaded[weekday]){
+    if(!_isDayLoaded[weekday]){
       String url = Properties.URL_API_CONSULTA + "/schedules?limit=4000&filter="+Anime.diasSemanaLista[weekday];
-      String loadedData = await loadFromURL(url, clientMock);
+      String loadedData = await loadFromURL(url);
       animeData.addAll(_parseJsonAnimeData(loadedData));
-      isDayLoaded[weekday] = true;
+      _isDayLoaded[weekday] = true;
     }
     int timeZoneDiff = getTimezoneDiffToJapan();
     if(timeZoneDiff != 0){
       int weekdayAdj = timeZoneDiff < 0 ? (weekday + 1) % 7 : (weekday - 1) % 7;
-      if(!isDayLoaded[weekdayAdj]){
+      if(!_isDayLoaded[weekdayAdj]){
         String url = Properties.URL_API_CONSULTA + "/schedules?limit=4000&filter="+Anime.diasSemanaLista[weekdayAdj];
-        isDayLoaded[weekdayAdj] = true;
-        String loadedData = await loadFromURL(url, clientMock);
+        _isDayLoaded[weekdayAdj] = true;
+        String loadedData = await loadFromURL(url);
         animeData.addAll(_parseJsonAnimeData(loadedData));
       }
     }
     animeListInMemory.addAll(animeData);
     return;
-    //return animeData;
+  }
+
+    ///Para carregamento dos dados da API de forma eficiente, esse método considera a diferença de fuso horário e faz a busca pela URL
+  ///no dia corrente e também no dia adjacente
+  Future<List<Anime>> fetchJsonDataScheduledAnimesOfWeek() async{
+    List<Anime> animeData = [];
+    String url = Properties.URL_API_CONSULTA + "/schedules?limit=4000";
+    String loadedData = await loadFromURL(url);
+    animeData.addAll(_parseJsonAnimeData(loadedData));
+    return animeData;
   }
 
   List<Anime> _parseJsonAnimeData(String jsonBruto){
@@ -168,7 +182,7 @@ class JikanApiService{
   Future<List<Anime>> findAllByDay(selectedDay) async {
     //List<Anime> loadedAnimeData = await loadJsonData();
     List<Anime> dailyAnimeList = [];
-    await loadJsonDatafromFile();
+    await _loadJsonDatafromFile();
     await loadJsonDataByWeekday(selectedDay);
     animeListInMemory.forEach((element) {
       if(verifyIfIsAnimeInSelectedDay(selectedDay, element.broadcastDayApi, element.broadcastTimeApi)){
@@ -183,14 +197,12 @@ class JikanApiService{
     return dailyAnimeList;
   }
 
-  Future<Anime> loadAnimeDetails(Anime anime, [http.Client http]) async {
+  Future<AnimeDetails> loadAnimeDetails(int id) async {
     //Anime anime = ;
-    String url = Properties.URL_API_CONSULTA + "/anime/${anime.id}/full";
-    String loadedData = await loadFromURL(url, http);
+    String url = Properties.URL_API_CONSULTA + "/anime/${id}/full";
+    String loadedData = await loadFromURL(url);
     var dadosJson = json.decode(loadedData);
-    anime.animeDetails = AnimeDetails.fromJson(dadosJson);
-    print("carregou dados");
-    print(anime.animeDetails.genres.toString());
-    return anime;
+    AnimeDetails details = AnimeDetails.fromJson(dadosJson);
+    return  details;
   }
 }

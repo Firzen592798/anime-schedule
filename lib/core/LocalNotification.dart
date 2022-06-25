@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'Anime.dart';
+import '../model/Anime.dart';
 
 class LocalNotification {
   LocalNotification(Map<dynamic, Object> map, {

@@ -1,10 +1,11 @@
 import 'package:animeschedule/model/Anime.dart';
-import 'package:animeschedule/service/JikanApiService.dart';
-import 'package:animeschedule/themes/AppTheme.dart';
+import 'package:animeschedule/service-impl/JikanApiService.dart';
+import 'package:animeschedule/service/IAnimeApiService.dart';
+import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 
-import '../service/LocalStorageService.dart';
+import '../service-impl/LocalStorageService.dart';
 
 class DetalheAnimeView extends StatefulWidget {
 
@@ -18,9 +19,9 @@ class DetalheAnimeView extends StatefulWidget {
 
 class _DetalheAnimeViewState extends State<DetalheAnimeView> {
 
-  JikanApiService jikanApiService = JikanApiService();
+  IAnimeAPiService jikanApiService = JikanApiService();
 
-  LocalStorageService localService = LocalStorageService();
+  ILocalStorageService localService = LocalStorageService();
 
   Anime anime;
 
@@ -28,10 +29,9 @@ class _DetalheAnimeViewState extends State<DetalheAnimeView> {
   Future<void> initState() {
     anime = widget.anime;
     
-    jikanApiService.loadAnimeDetails(anime).then((value) {
+    jikanApiService.loadAnimeDetails(widget.anime.id).then((value) {
       setState(() {
-         anime = value;
-         print("sinopse ${anime.animeDetails.synopsis}");
+         anime.animeDetails = value;
       });
      
     });

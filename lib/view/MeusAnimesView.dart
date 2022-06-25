@@ -1,8 +1,10 @@
 import 'package:animeschedule/core/ApiResponse.dart';
 import 'package:animeschedule/model/Anime.dart';
-import 'package:animeschedule/service/JikanApiService.dart';
-import 'package:animeschedule/service/LocalStorageService.dart';
-import 'package:animeschedule/service/NotificationService.dart';
+import 'package:animeschedule/service-impl/JikanApiService.dart';
+import 'package:animeschedule/service-impl/LocalStorageService.dart';
+import 'package:animeschedule/service-impl/NotificationService.dart';
+import 'package:animeschedule/service/IAnimeApiService.dart';
+import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +20,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   List<Anime> _listaAnimes = [];
   List<Anime> _listaAnimesUsuario;
-  JikanApiService _apiService = JikanApiService();
+  IAnimeAPiService _apiService = JikanApiService();
 
   int selectedDay = 0;
 
@@ -26,7 +28,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   List<String> listaDias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
-  LocalStorageService localService = LocalStorageService();
+  ILocalStorageService localService = LocalStorageService();
 
   NotificationService notificationService = NotificationService();
 

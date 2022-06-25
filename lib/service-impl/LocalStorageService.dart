@@ -1,12 +1,14 @@
 import 'dart:convert';
 
-import 'package:animeschedule/model/ConfigPrefs.dart';
+import 'package:animeschedule/core/ConfigPrefs.dart';
+import 'package:animeschedule/service-impl/JikanApiService.dart';
+import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/Anime.dart';
 
 /// Service para gerenciar o armazenamento dos dados em local storage 
-class LocalStorageService{
+class LocalStorageService implements ILocalStorageService{
   static final LocalStorageService _singleton = LocalStorageService._internal();
 
   LocalStorageService._internal();

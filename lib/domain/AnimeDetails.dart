@@ -1,15 +1,11 @@
 class AnimeDetails {
-  DateTime _correctBroadcastStart;
   String _synopsis;
   String _urlImagemGrande;
   List<String> _studios;
   List<String> _genres;
   List<String> _openings;
   List<String> _endings;
-  get correctBroadcastStart => this._correctBroadcastStart;
-
-  set correctBroadcastStart(value) => this._correctBroadcastStart = value;
-
+  
   get synopsis => this._synopsis;
 
   set synopsis(value) => this._synopsis = value;

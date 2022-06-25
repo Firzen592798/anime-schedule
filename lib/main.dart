@@ -3,7 +3,7 @@ import 'package:animeschedule/view/MeusAnimesView.dart';
 import 'package:animeschedule/view/PreferenciasView.dart';
 import 'package:flutter/material.dart';
 
-import 'service/NotificationService.dart';
+import 'service-impl/NotificationService.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

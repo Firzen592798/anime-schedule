@@ -1,6 +1,6 @@
-import 'package:animeschedule/service/JikanApiService.dart';
-import 'package:animeschedule/service/LocalStorageService.dart';
-import 'package:animeschedule/service/SchedulerService.dart';
+import 'package:animeschedule/service-impl/JikanApiService.dart';
+import 'package:animeschedule/service-impl/LocalStorageService.dart';
+import 'package:animeschedule/service-impl/SchedulerService.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:animeschedule/model/Anime.dart';

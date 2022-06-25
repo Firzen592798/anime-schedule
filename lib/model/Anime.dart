@@ -1,4 +1,4 @@
-import 'package:animeschedule/model/AnimeDetails.dart';
+import 'package:animeschedule/domain/AnimeDetails.dart';
 
 class Anime implements Comparable<Anime>{
   
