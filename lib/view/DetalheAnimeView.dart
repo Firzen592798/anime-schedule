@@ -1,17 +1,18 @@
-import 'package:animeschedule/model/Anime.dart';
+import 'package:animeschedule/model/AnimeApi.dart';
 import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service/IAnimeApiService.dart';
 import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 
+import '../domain/AnimeLocal.dart';
 import '../service-impl/LocalStorageService.dart';
 
 class DetalheAnimeView extends StatefulWidget {
 
-  final Anime anime;
+  final AnimeLocal anime;
 
-  const DetalheAnimeView({Key key, Anime this.anime}) : super(key: key);
+  const DetalheAnimeView({Key key, AnimeLocal this.anime}) : super(key: key);
 
   @override
   State<DetalheAnimeView> createState() => _DetalheAnimeViewState();
@@ -23,7 +24,9 @@ class _DetalheAnimeViewState extends State<DetalheAnimeView> {
 
   ILocalStorageService localService = LocalStorageService();
 
-  Anime anime;
+  AnimeLocal anime;
+
+  bool isChanged = false;
 
   @override
   Future<void> initState() {
@@ -39,15 +42,17 @@ class _DetalheAnimeViewState extends State<DetalheAnimeView> {
   }
 
   voltar(){
-    Navigator.pop(context);
+    Navigator.pop(context, isChanged);
   }
 
   _marcar(){
+    isChanged = !isChanged;
     anime.marcado = true;
     localService.adicionarMarcacaoAnime(anime);
   }
 
   _desmarcar(){
+    isChanged = !isChanged;
     anime.marcado = false;
     localService.removerMarcacaoAnime(anime.id);
   }

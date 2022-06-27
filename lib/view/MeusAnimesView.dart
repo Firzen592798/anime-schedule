@@ -1,5 +1,4 @@
 import 'package:animeschedule/core/ApiResponse.dart';
-import 'package:animeschedule/model/Anime.dart';
 import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
 import 'package:animeschedule/service-impl/NotificationService.dart';
@@ -8,6 +7,8 @@ import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:animeschedule/widget/MenuLateral.dart';
 import 'package:flutter/material.dart';
 
+import '../core/Consts.dart';
+import '../domain/AnimeLocal.dart';
 import '../widget/AnimeListItem.dart';
 import 'DetalheAnimeView.dart';
 
@@ -18,15 +19,13 @@ class MeusAnimesView extends StatefulWidget {
 
 class _MeusAnimesViewState extends State<MeusAnimesView> {
 
-  List<Anime> _listaAnimes = [];
-  List<Anime> _listaAnimesUsuario;
+  List<AnimeLocal> _listaAnimes = [];
+  List<AnimeLocal> _listaAnimesUsuario;
   IAnimeAPiService _apiService = JikanApiService();
 
   int selectedDay = 0;
 
   bool showOnlyMarkedAnimes = false;
-
-  List<String> listaDias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
   ILocalStorageService localService = LocalStorageService();
 
@@ -40,54 +39,56 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
   }
 
   _carregarAnimes() async{
-    //GlobalVar().usuarioMAL = usuarioMAL;
     String usuarioMAL = "";
-
-      List<Anime> dailyAnimeList = await _apiService.findAllByDay(selectedDay);
-        //Se tiver usuário do MAL logado, o código puxa a lista dos animes marcados como watching no mal
-        if(usuarioMAL != ""){
-          if(_listaAnimesUsuario == null){
-            ApiResponse responseUsuario = await _apiService.listarAnimesUsuario(usuarioMAL);
-            if(!responseUsuario.isError){
-              _listaAnimesUsuario = responseUsuario.data;
-            }
+    List<AnimeLocal> dailyAnimeList = await _apiService.findAllByDay(selectedDay);
+      //Se tiver usuário do MAL logado, o código puxa a lista dos animes marcados como watching no mal
+      if(usuarioMAL != ""){
+        if(_listaAnimesUsuario == null){
+          ApiResponse responseUsuario = await _apiService.listarAnimesUsuario(usuarioMAL);
+          if(!responseUsuario.isError){
+            _listaAnimesUsuario = responseUsuario.data;
           }
-          _listaAnimes = [];
-          
-          for(int j = 0; j < dailyAnimeList.length; j++){
-            Anime animeDia = dailyAnimeList[j];
-            
-            for(int i = 0; i < _listaAnimesUsuario.length; i++){
-              if(_listaAnimesUsuario[i].id == animeDia.id){               
-                _listaAnimes.add(animeDia);
-                _listaAnimes.last.episodiosAssistidos = _listaAnimesUsuario[i].episodiosAssistidos;
-              }
-            }
-          }
-        }else{ //se não tiver usuário logado, puxa os animes do local storage que foram marcados como assistindo.
-          List<Anime> favoriteAnimeList = await localService.getMarkedAnimes();
-          dailyAnimeList.where((element) => element.id > 0).forEach((element) {
-            if(favoriteAnimeList.contains(element)){
-              element.marcado = true;
-            }
-          });
-          setState(() {
-            _listaAnimes = dailyAnimeList;
-          });
         }
+        _listaAnimes = [];
+        
+        for(int j = 0; j < dailyAnimeList.length; j++){
+          AnimeLocal animeDia = dailyAnimeList[j];
+          
+          for(int i = 0; i < _listaAnimesUsuario.length; i++){
+            if(_listaAnimesUsuario[i].id == animeDia.id){               
+              _listaAnimes.add(animeDia);
+            }
+          }
+        }
+      }else{ //se não tiver usuário logado, puxa os animes do local storage que foram marcados como assistindo.
+        List<AnimeLocal> favoriteAnimeList = await localService.getMarkedAnimes();
+        dailyAnimeList.where((element) => element.id > 0).forEach((element) {
+          if(favoriteAnimeList.any((favorite) => favorite.id == element.id)){
+            element.marcado = true;
+          }
+        });
+        setState(() {
+          _listaAnimes = dailyAnimeList;
+        });
+      }
   }
 
-  _marcar(Anime anime){
+  _marcar(AnimeLocal anime){
     localService.adicionarMarcacaoAnime(anime);
   }
 
-  _desmarcar(Anime anime){
+  _desmarcar(AnimeLocal anime){
     localService.removerMarcacaoAnime(anime.id);
   }
 
-  _showDetailsPage(index){
+  _showDetailsPage(index) async {
     print("showDetailsPage ${_listaAnimes[index].titulo}");
-    Navigator.push(context,  MaterialPageRoute(builder: (context) => DetalheAnimeView(anime: _listaAnimes[index])));
+    bool isChanged = await Navigator.push(context,  MaterialPageRoute(builder: (context) => DetalheAnimeView(anime: _listaAnimes[index])));
+    if(isChanged){
+      setState(() {
+
+      });
+    }
   }
 
 
@@ -118,7 +119,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
                 DropdownButton<String>(
                     underline: SizedBox.shrink(),
                     borderRadius: BorderRadius.all(Radius.circular(20)),
-                    items: listaDias.map((String value) {
+                    items: Consts.listaDias.map((String value) {
                       return new DropdownMenuItem<String>(
                         value: value,
                         child: new Text(
@@ -127,10 +128,10 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
                         ),
                       );
                     }).toList(),
-                    value: listaDias[selectedDay],
+                    value: Consts.listaDias[selectedDay],
                     onChanged: (newVal) {
                       this.setState(() {
-                        selectedDay = listaDias.indexOf(newVal);
+                        selectedDay = Consts.listaDias.indexOf(newVal);
                         _carregarAnimes();
                       });
                     },
@@ -178,73 +179,6 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
         ],
       ),
     );
-  }
-
-  
-
-  Widget criarItem(context, index){
-      final isMarked = _listaAnimes[index].marcado;
-      if(isMarked || !showOnlyMarkedAnimes){
-        return  SizedBox(
-          height: 100,
-          width: double.infinity,
-          child: ListTile(
-            dense:true,            
-            
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children:  <Widget>[
-                IconButton(
-                  icon: !isMarked ? const Icon(Icons.star_outline) :  const Icon(Icons.star),
-                  tooltip: !isMarked ? 'Marcar como Assistindo' : 'Remover marcação',
-                  onPressed: () {
-                    setState(() {
-                      if(!isMarked){
-                        _marcar(index);
-                      }else{
-                        _desmarcar(index);
-                      }
-                    });
-                  },
-                )
-              ],
-            ),
-            title: Text(_listaAnimes[index].titulo),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children:  <Widget>[
-                Text(
-                  _listaAnimes[index].correctBroadcastTime,
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
-                ],
-              ),
-              
-            
-            // leading: FittedBox(
-            //   fit: BoxFit.fill,
-            //   child: CircleAvatar(
-            //     radius: 100,
-            //     backgroundColor: Colors.amber,
-            //   ),
-            // ),
-            
-            leading: Image(
-              alignment: Alignment.center,
-              height: 200,
-              width: 200,
-              fit: BoxFit.fill,
-              image: NetworkImage(_listaAnimes[index].urlImagem)
-            ),
-            
-            
-            
-          )
-
-        );
-    }else{
-      return SizedBox.shrink();
-    }
   }
 }
 

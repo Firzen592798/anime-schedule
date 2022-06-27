@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import 'package:animeschedule/model/Anime.dart';
+import 'package:animeschedule/domain/AnimeLocal.dart';
 import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
-import 'package:animeschedule/service/IAnimeApiService.dart';
 import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -16,12 +15,8 @@ class MockLocalStorageService extends Mock implements ILocalStorageService{}
 void main() {
   ILocalStorageService localStorageService = LocalStorageService();
   
-  IAnimeAPiService animeApiServiceMock = JikanApiService();
-
-  ILocalStorageService localStorageMock = MockLocalStorageService();
-  
-  Anime newAnime(int id, String title) {
-    Anime anime = Anime();
+  AnimeLocal newAnime(int id, String title) {
+    AnimeLocal anime = AnimeLocal();
     anime.id = id;
     anime.titulo = title;
     anime.correctBroadcastDay ="Mondays";
@@ -60,7 +55,7 @@ void main() {
         List<String> animeList = prefs.getStringList("animeList");
         expect(animeList.length, 1);
         print(animeList.toString());
-        Anime addedAnime = Anime.fromJsonLocal(jsonDecode(animeList[0]));
+        AnimeLocal addedAnime = AnimeLocal.fromJson(jsonDecode(animeList[0]));
         expect(addedAnime.id, 1);
         expect(addedAnime.correctBroadcastDay, "Mondays");
         expect(addedAnime.correctBroadcastTime, "08:00");
@@ -79,7 +74,7 @@ void main() {
       SharedPreferences.getInstance().then((prefs) {
         List<String> animeList = prefs.getStringList("animeList");
         expect(animeList.length, 2);
-        Anime addedAnime = Anime.fromJsonLocal(jsonDecode(animeList[1]));
+        AnimeLocal addedAnime = AnimeLocal.fromJson(jsonDecode(animeList[1]));
         expect(addedAnime.id, 2);
       });
     });
@@ -122,38 +117,38 @@ void main() {
 
   group("getMarkedAnimes", () {
     test("Se a lista tiver vazia, espera-se um retorno sem nada", () async {
-      List<Anime> lista = await localStorageService.getMarkedAnimes();
+      List<AnimeLocal> lista = await localStorageService.getMarkedAnimes();
       expect(lista.length, 0);
     });
 
     test("Se a lista tiver com um elemento, espera-se um retorno condizente", () async {
       setInitialMockValues();
-      List<Anime> lista = await localStorageService.getMarkedAnimes();
+      List<AnimeLocal> lista = await localStorageService.getMarkedAnimes();
       expect(lista.length, 1);
     });
 
     test("Se a lista tiver com três elementos, espera-se um retorno condizente", () async {
       setInitialMockValues(qtd: 3);
-      List<Anime> lista = await localStorageService.getMarkedAnimes();
+      List<AnimeLocal> lista = await localStorageService.getMarkedAnimes();
       expect(lista.length, 3);
     });
   });
 
   group("getMarkedAnimesByDay", () {
     test("Se a lista tiver vazia, espera-se um retorno sem nada", () async {
-      List<Anime> lista = await localStorageService.getMarkedAnimesByDay(0);
+      List<AnimeLocal> lista = await localStorageService.getMarkedAnimesByDay(0);
       expect(lista.length, 0);
     });
 
     test("Se a lista tiver com 2 itens no dia Monday e for passado o 0 como parâmetro, espera-se uma lista com 2 animes como resultado", () async {
       setInitialMockValues(qtd: 2);
-      List<Anime> lista = await localStorageService.getMarkedAnimesByDay(0);
+      List<AnimeLocal> lista = await localStorageService.getMarkedAnimesByDay(0);
       expect(lista.length, 2);
     });
 
     test("Se a lista tiver com 2 itens no dia Monday e 3 Sunday e for passado o 6(domingo) como parâmetro, espera-se uma lista de 3 animes como resultado", () async {
       setInitialMockValues(qtd: 5);
-      List<Anime> lista = await localStorageService.getMarkedAnimesByDay(6);
+      List<AnimeLocal> lista = await localStorageService.getMarkedAnimesByDay(6);
       expect(lista.length, 3);
     });
   });

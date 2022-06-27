@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:animeschedule/core/ConfigPrefs.dart';
-import 'package:animeschedule/service-impl/JikanApiService.dart';
+import 'package:animeschedule/domain/ConfigPrefs.dart';
 import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../model/Anime.dart';
+import '../core/Consts.dart';
+import '../domain/AnimeLocal.dart';
 
 /// Service para gerenciar o armazenamento dos dados em local storage 
 class LocalStorageService implements ILocalStorageService{
@@ -40,7 +40,7 @@ class LocalStorageService implements ILocalStorageService{
     });
   }
 
-  Future<void>adicionarMarcacaoAnime(Anime anime) async{
+  Future<void>adicionarMarcacaoAnime(AnimeLocal anime) async{
     await SharedPreferences.getInstance().then((prefs) {
       List<String> animelist = prefs.getStringList("animeList") ?? [];
       animelist.add(jsonEncode(anime.toJson()));
@@ -57,21 +57,21 @@ class LocalStorageService implements ILocalStorageService{
     });
   }
 
-  Future<List<Anime>> getMarkedAnimes() async {
-    List<Anime> animeList = [];
+  Future<List<AnimeLocal>> getMarkedAnimes() async {
+    List<AnimeLocal> animeList = [];
     await SharedPreferences.getInstance().then((prefs) {
       if(prefs.containsKey("animeList")){
         List<String> animes = prefs.getStringList("animeList");
-        animeList = animes.map((e) => Anime.fromJsonLocal(jsonDecode(e))).toList();
+        animeList = animes.map((e) => AnimeLocal.fromJson(jsonDecode(e))).toList();
       }
     });
     return animeList;
   }
 
-  Future<List<Anime>> getMarkedAnimesByDay(int day) async {
-    List<Anime> animeList = await getMarkedAnimes();
-    List<Anime> dailyAnimeList = animeList.where((element) => (element.correctBroadcastDay == Anime.diasSemanaListaCapitalized[day])).toList();
-    dailyAnimeList.sort();
-    return dailyAnimeList;
+  Future<List<AnimeLocal>> getMarkedAnimesByDay(int day) async {
+    List<AnimeLocal> animeList = await getMarkedAnimes();
+    animeList = animeList.where((element) => (element.correctBroadcastDay == Consts.diasSemanaListaCapitalized[day])).toList();
+    animeList.sort();
+    return animeList;
   }
 }

@@ -1,4 +1,4 @@
-import 'package:animeschedule/core/ConfigPrefs.dart';
+import 'package:animeschedule/domain/ConfigPrefs.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
 import 'package:animeschedule/service-impl/SchedulerService.dart';
 import 'package:animeschedule/core/GlobalVar.dart';

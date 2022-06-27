@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../model/Anime.dart';
+import 'AnimeLocal.dart';
 
 class LocalNotification {
   LocalNotification(Map<dynamic, Object> map, {
@@ -11,7 +11,7 @@ class LocalNotification {
     this.timeOfDay,
   });
 
-  LocalNotification.from(List<Anime> animes){
+  LocalNotification.from(List<AnimeLocal> animes){
     DateTime now = DateTime.now();
     String idStr ="${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
     String texto = "";

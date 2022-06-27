@@ -1,10 +1,11 @@
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:animeschedule/core/LocalNotification.dart';
+import 'package:animeschedule/domain/LocalNotification.dart';
+import 'package:animeschedule/domain/AnimeLocal.dart';
 import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
 import 'package:animeschedule/service-impl/NotificationService.dart';
 import 'package:animeschedule/service/IAnimeApiService.dart';
-import '../model/Anime.dart';
+import '../model/AnimeApi.dart';
 import '../service/ILocalStorageService.dart';
 
 class SchedulerService{
@@ -44,11 +45,11 @@ class SchedulerService{
     }
     int qtdRemovidos = 0;
     int weekday = DateTime.now().weekday - 1;
-    List<Anime> animesFromLocalStorage = await localService.getMarkedAnimesByDay(weekday);
+    List<AnimeLocal> animesFromLocalStorage = await localService.getMarkedAnimesByDay(weekday);
     if(animesFromLocalStorage.isNotEmpty){
-      List<Anime> animesFromAPI = await jikanApiService.findAllByDay(weekday);
+      List<AnimeLocal> animesFromAPI = await jikanApiService.findAllByDay(weekday);
       animesFromLocalStorage.forEach((localAnime) {
-        Anime anime = animesFromAPI.firstWhere((element) => localAnime.id == element.id);
+        AnimeLocal anime = animesFromAPI.firstWhere((element) => localAnime.id == element.id);
         if(anime != null && anime.correctBroadcastEnd != null){
           if(anime.correctBroadcastEnd.isBefore(dateNow)){
             localService.removerMarcacaoAnime(anime.id);
@@ -61,8 +62,8 @@ class SchedulerService{
   }
 
   void doUpdateEndBroadcastOfLocalData([DateTime dateNow]) async{
-    List<Anime> remoteAnimeData = await jikanApiService.fetchJsonDatafromFile();
-    List<Anime> localAnimeData = await localService.getMarkedAnimes();
+    List<AnimeLocal> remoteAnimeData = await jikanApiService.fetchJsonDatafromFile();
+    List<AnimeLocal> localAnimeData = await localService.getMarkedAnimes();
     
     localAnimeData.where((element) => element.correctBroadcastEnd != null);
     localAnimeData.where((element) => element.correctBroadcastEnd != null).forEach((element) {

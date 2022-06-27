@@ -1,15 +1,46 @@
+import 'package:intl/intl.dart';
+
+import 'AnimeDetails.dart';
+
 class AnimeLocal implements Comparable<AnimeLocal> {
   int _id;
   String _titulo;
-  String _tipo;
-  String _estudio;
   int _episodios;
-  String _correctBroadcastDay;
-  String _correctBroadcastTime;
   String _urlImagem;
   bool _marcado;
+  String _correctBroadcastDay;
+  String _correctBroadcastTime;
   DateTime _correctBroadcastStart;
   DateTime _correctBroadcastEnd;
+  AnimeDetails _animeDetails;
+
+  AnimeDetails get animeDetails => this._animeDetails;
+
+  set animeDetails(AnimeDetails animeDetails) => this._animeDetails = animeDetails;
+
+  AnimeLocal();
+
+  AnimeLocal.fromJson(Map<String, dynamic> json){
+    _id = json['mal_id'] ?? 0;
+    _titulo = json['title'] ?? "";
+    _urlImagem = json['image_url'] ?? "";
+    _episodios = json['episodes'] ?? 0;
+    _correctBroadcastEnd =  json['correct_broadcast_end'] == null ? null : DateTime.parse(json['correct_broadcast_end']);
+    _correctBroadcastDay = json['correct_broadcast_day'] ?? "";
+    _correctBroadcastTime = json['correct_broadcast_time'] ?? "";
+    _marcado = false;
+  }
+
+  Map<String, dynamic> toJson() => {
+    'mal_id': _id,
+    'title': _titulo,
+    'image_url': _urlImagem,
+    'episodes': _episodios,
+    'correct_broadcast_end':_correctBroadcastEnd != null ? _correctBroadcastEnd.toIso8601String() : null,
+    'correct_broadcast_day': _correctBroadcastDay,
+    'correct_broadcast_time': _correctBroadcastTime,
+  };
+
 
   get id => this._id;
 
@@ -18,14 +49,6 @@ class AnimeLocal implements Comparable<AnimeLocal> {
   get titulo => this._titulo;
 
   set titulo(value) => this._titulo = value;
-
-  get tipo => this._tipo;
-
-  set tipo(value) => this._tipo = value;
-
-  get estudio => this._estudio;
-
-  set estudio(value) => this._estudio = value;
 
   get episodios => this._episodios;
 
@@ -47,13 +70,20 @@ class AnimeLocal implements Comparable<AnimeLocal> {
 
   set marcado(value) => this._marcado = value;
 
-  get correctBroadcastStart => this._correctBroadcastStart;
+  DateTime get correctBroadcastStart => this._correctBroadcastStart;
 
-  set correctBroadcastStart(value) => this._correctBroadcastStart = value;
+  set correctBroadcastStart(DateTime value) => this._correctBroadcastStart = value;
 
-  get correctBroadcastEnd => this._correctBroadcastEnd;
+  DateTime get correctBroadcastEnd => this._correctBroadcastEnd;
 
-  set correctBroadcastEnd(value) => this._correctBroadcastEnd = value;
+  set correctBroadcastEnd(DateTime value) => this._correctBroadcastEnd = value;
+
+  String get transmissionRange {
+    String transmissionRangeStr = this.correctBroadcastStart != null ? DateFormat("dd/MM/yyyy").format(this.correctBroadcastStart) +" - " : "";
+    transmissionRangeStr += this.correctBroadcastEnd == null ? "Indefinido" : DateFormat("dd/MM/yyyy").format(this.correctBroadcastEnd) ;
+    return transmissionRangeStr;
+  }
+
   @override
   int compareTo(AnimeLocal other) {
     return this.correctBroadcastTime.compareTo(other.correctBroadcastTime);

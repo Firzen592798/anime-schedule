@@ -1,16 +1,16 @@
-import '../model/Anime.dart';
-import '../core/ConfigPrefs.dart';
+import '../domain/AnimeLocal.dart';
+import '../domain/ConfigPrefs.dart';
 
 abstract class ILocalStorageService{
   Future<ConfigPrefs> getConfigPrefs();
 
   salvarPrefs(ConfigPrefs configPrefs);
 
-  Future<void>adicionarMarcacaoAnime(Anime anime);
+  Future<void>adicionarMarcacaoAnime(AnimeLocal anime);
 
   Future<void> removerMarcacaoAnime(int id);
 
-  Future<List<Anime>> getMarkedAnimes();
+  Future<List<AnimeLocal>> getMarkedAnimes();
 
-  Future<List<Anime>> getMarkedAnimesByDay(int day);
+  Future<List<AnimeLocal>> getMarkedAnimesByDay(int day);
 }
