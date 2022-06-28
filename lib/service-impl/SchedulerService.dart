@@ -61,15 +61,26 @@ class SchedulerService{
     return qtdRemovidos;
   }
 
-  void doUpdateEndBroadcastOfLocalData([DateTime dateNow]) async{
-    List<AnimeLocal> remoteAnimeData = await jikanApiService.fetchJsonDatafromFile();
+  //Pesquisa os animes remotos e verifica se eles estão com a data de broadcast end atualizzada para ser repassada aos registros locais.
+  Future<List<AnimeLocal>> doUpdateEndBroadcastOfLocalData([DateTime dateNow]) async{
     List<AnimeLocal> localAnimeData = await localService.getMarkedAnimes();
-    
-    localAnimeData.where((element) => element.correctBroadcastEnd != null);
-    localAnimeData.where((element) => element.correctBroadcastEnd != null).forEach((element) {
-      
-    });
-
+    if(!localAnimeData.isEmpty && localAnimeData.any((element) => element.correctBroadcastEnd == null)){
+      List<AnimeLocal> remoteAnimeData = await jikanApiService.fetchJsonDatafromFile();
+      localAnimeData.forEach((animeLocal) {
+        remoteAnimeData.forEach((animeRemote) {
+          if(animeLocal.id == animeRemote.id){
+            animeLocal.correctBroadcastEnd = animeRemote.correctBroadcastEnd;
+            animeLocal.correctBroadcastStart = animeRemote.correctBroadcastStart;
+            animeLocal.correctBroadcastTime = animeRemote.correctBroadcastTime;
+            animeLocal.correctBroadcastDay = animeRemote.correctBroadcastDay;
+            animeLocal.episodios = animeRemote.episodios;
+            animeLocal.urlImagem = animeRemote.urlImagem;
+          }
+        });
+      });
+      localService.atualizarMarcacoes(localAnimeData);
+    }
+    return localAnimeData;
   }
 
   Future<DateTime> scheduleFixedTimeOfDay(String timeOfDay, [DateTime dateNow]) async {

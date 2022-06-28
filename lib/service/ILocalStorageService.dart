@@ -10,6 +10,8 @@ abstract class ILocalStorageService{
 
   Future<void> removerMarcacaoAnime(int id);
 
+  Future<void>atualizarMarcacoes(List<AnimeLocal> animeLista);
+
   Future<List<AnimeLocal>> getMarkedAnimes();
 
   Future<List<AnimeLocal>> getMarkedAnimesByDay(int day);

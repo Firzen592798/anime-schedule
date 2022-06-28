@@ -74,4 +74,16 @@ class LocalStorageService implements ILocalStorageService{
     animeList.sort();
     return animeList;
   }
+  
+  @override
+  Future<List<String>> atualizarMarcacoes (List<AnimeLocal> animeLista) async{
+    List<String> animelistStr = []; 
+    await SharedPreferences.getInstance().then((prefs) {
+      animeLista.forEach((element) {
+        animelistStr.add(jsonEncode(element.toJson()));
+      });
+      prefs.setStringList("animeList", animelistStr);
+    });
+    return animelistStr;
+  }
 }
