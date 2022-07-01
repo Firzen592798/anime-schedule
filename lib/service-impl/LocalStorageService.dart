@@ -57,6 +57,25 @@ class LocalStorageService implements ILocalStorageService{
     });
   }
 
+  Future<void> removerMarcacaoAnimesFinalizados([DateTime dateTimeNow]) async{
+    if(dateTimeNow == null){
+      dateTimeNow = new DateTime.now();
+    }
+    List<AnimeLocal> animeList = [];
+    await SharedPreferences.getInstance().then((prefs) {
+      List<String> animelistStr = prefs.getStringList("animeList") ?? [];
+      animelistStr.forEach((element) {
+        animeList.add(AnimeLocal.fromJson(json.decode(element)));
+      });
+      int lengthBeforeRemoval = animeList.length;
+      animeList.removeWhere((element) => element.correctBroadcastEnd?.isBefore(dateTimeNow));
+      if(lengthBeforeRemoval > animeList.length){
+        atualizarMarcacoes(animeList);
+      }
+    });
+    return;
+  }
+
   Future<List<AnimeLocal>> getMarkedAnimes() async {
     List<AnimeLocal> animeList = [];
     await SharedPreferences.getInstance().then((prefs) {

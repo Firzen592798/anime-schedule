@@ -15,4 +15,6 @@ abstract class ILocalStorageService{
   Future<List<AnimeLocal>> getMarkedAnimes();
 
   Future<List<AnimeLocal>> getMarkedAnimesByDay(int day);
+
+  void removerMarcacaoAnimesFinalizados([DateTime dateTime]);
 }

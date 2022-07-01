@@ -28,7 +28,7 @@ class AnimeLocal implements Comparable<AnimeLocal> {
     _correctBroadcastEnd =  json['correct_broadcast_end'] == null ? null : DateTime.parse(json['correct_broadcast_end']);
     _correctBroadcastDay = json['correct_broadcast_day'] ?? "";
     _correctBroadcastTime = json['correct_broadcast_time'] ?? "";
-    _correctBroadcastStart = json['correct_broadcast_start'] ?? "";
+    _correctBroadcastStart = json['correct_broadcast_start'] == null ? null : DateTime.parse(json['correct_broadcast_start']);
     _marcado = false;
   }
 
@@ -37,10 +37,10 @@ class AnimeLocal implements Comparable<AnimeLocal> {
     'title': _titulo,
     'image_url': _urlImagem,
     'episodes': _episodios,
-    'correct_broadcast_end':_correctBroadcastEnd != null ? _correctBroadcastEnd.toIso8601String() : null,
     'correct_broadcast_day': _correctBroadcastDay,
     'correct_broadcast_time': _correctBroadcastTime,
-    'correct_broadcast_start': _correctBroadcastStart,
+    'correct_broadcast_end':_correctBroadcastEnd != null ? _correctBroadcastEnd.toIso8601String() : null,
+    'correct_broadcast_start':_correctBroadcastStart != null ? _correctBroadcastStart.toIso8601String() : null,
   };
 
 

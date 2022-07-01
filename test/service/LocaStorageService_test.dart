@@ -5,6 +5,7 @@ import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
 import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +23,7 @@ void main() {
     anime.correctBroadcastDay ="Mondays";
     anime.correctBroadcastTime = "08:00";
     anime.correctBroadcastEnd = DateTime(2022, 6, 6);
+    anime.correctBroadcastStart = DateTime(2022, 3, 3);
     return anime;
   }
 
@@ -29,7 +31,10 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  setInitialMockValues({qtd = 1}) {
+  List<String> setInitialMockValues({qtd = 1, DateTime broadcastEnd}) {
+    if(broadcastEnd == null){
+      broadcastEnd = DateTime(2022, 6, 6);
+    }
     List<String> initialStringList = [];
     for (int i = 1; i <= qtd; i++) {
       Map<String, Object> initialAnimeMap = {
@@ -40,11 +45,13 @@ void main() {
         "watched_episodes": 1,
         "correct_broadcast_day": i <= 2 ? "Mondays" : "Sundays",
         "correct_broadcast_time": "08:00",
+        "correct_broadcast_end": broadcastEnd.toIso8601String(),
         "type": "type"
       };
       initialStringList.add(jsonEncode(initialAnimeMap).toString());
     }
     SharedPreferences.setMockInitialValues({"animeList": initialStringList});
+    return initialStringList;
   }
 
   group('adicionarMarcacaoAnime', () {
@@ -65,9 +72,8 @@ void main() {
       });
     });
 
-    test(
-        'Adicionar um novo anime em uma lista que já possui um registro inicial, espera-se que hajam 2 registros',
-        () async {
+    test('Adicionar um novo anime em uma lista que já possui um registro inicial, espera-se que hajam 2 registros', 
+      () async {
       //SharedPreferences.setMockInitialValues(<String, Object>{'counter': 1});
       setInitialMockValues();
       await localStorageService.adicionarMarcacaoAnime(newAnime(2, "Bleach"));
@@ -134,6 +140,44 @@ void main() {
     });
   });
 
+  group("removerMarcacaoAnimesFinalizados", () {
+    test("Dado a data atual superior a dos animes salvos em local, espera-se a remoção dos animes", () async {
+       setInitialMockValues(qtd:2);
+       await localStorageService.removerMarcacaoAnimesFinalizados(DateTime(2022, 6, 7));
+       SharedPreferences.getInstance().then((prefs) {
+       List<String> animeList = prefs.getStringList("animeList");
+       expect(0, animeList.length);
+      });
+    });
+
+    test("Dado a data atual igual a dos animes salvos em local, nenhuma remoção deve acontecer", () async {
+       setInitialMockValues(qtd:2);
+       await localStorageService.removerMarcacaoAnimesFinalizados(DateTime(2022, 6, 5));
+       SharedPreferences.getInstance().then((prefs) {
+       List<String> animeList = prefs.getStringList("animeList");
+       expect(2, animeList.length);
+      });
+    });
+
+    test("Dado a data atual menor a dos animes salvos em local, nenhuma remoção deve acontecer", () async {
+       setInitialMockValues(qtd:2);
+       await localStorageService.removerMarcacaoAnimesFinalizados(DateTime(2022, 6, 5));
+       SharedPreferences.getInstance().then((prefs) {
+       List<String> animeList = prefs.getStringList("animeList");
+       expect(2, animeList.length);
+      });
+    });
+
+    test("Dado que o broadcastEnd dos animes salvos é null, nenhuma remoção deve acontecer", () async {
+       setInitialMockValues(qtd:2);
+       await localStorageService.removerMarcacaoAnimesFinalizados(DateTime(2022, 6, 5));
+       SharedPreferences.getInstance().then((prefs) {
+       List<String> animeList = prefs.getStringList("animeList");
+       expect(2, animeList.length);
+      });
+    });
+  });
+
   group("getMarkedAnimesByDay", () {
     test("Se a lista tiver vazia, espera-se um retorno sem nada", () async {
       List<AnimeLocal> lista = await localStorageService.getMarkedAnimesByDay(0);
@@ -153,4 +197,18 @@ void main() {
     });
   });
 
+  group("atualizarMarcacoes", () {
+    test("", () async {
+      setInitialMockValues(qtd: 1);
+      List<AnimeLocal> animes = [newAnime(1, "N1")];
+      await localStorageService.atualizarMarcacoes(animes);
+      SharedPreferences.getInstance().then((prefs) {
+        List<String> animeList = prefs.getStringList("animeList");
+        AnimeLocal savedAnime = AnimeLocal.fromJson(jsonDecode(animeList[0]));
+        expect("N1", savedAnime.titulo);
+        expect("06/06/2022", DateFormat("dd/MM/yyyy").format(savedAnime.correctBroadcastEnd));
+        expect("03/03/2022", DateFormat("dd/MM/yyyy").format(savedAnime.correctBroadcastStart));
+      });
+    });
+  });
 }

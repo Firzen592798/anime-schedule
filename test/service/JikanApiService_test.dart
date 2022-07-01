@@ -35,11 +35,12 @@ void main() {
     ///Boruto - "Sundays at 17:30 (JST)" -> Expect Sunday 5:30
     ///Spy x Family - "Saturdays at 23:00 (JST)" -> Expect Saturday 11:00
     ///Kaguya Sama - "Saturdays at 00:00 (JST)" -> Expect Friday 12:00
-    api.httpClient = httpMock;
+    
     test('Ao passar como parâmetro segunda(0), espera-se que nada seja retornado', () async {
+      api.httpClient = httpMock;
       var answers = [
-        Response(Json.ANIME_LISTA_SATURDAY, 200),
-        Response(Json.ANIME_LISTA_SUNDAY, 200)
+        Response(Json.ANIME_LISTA_VAZIA, 200),
+        Response(Json.ANIME_LISTA_VAZIA, 200)
       ];
       when(httpMock.get(any)).thenAnswer((_) async => answers.removeAt(0));
       List<AnimeLocal> lista =  await api.findAllByDay(0);
@@ -47,6 +48,7 @@ void main() {
     });
 
     test('Ao passar como parâmetro sábado(5), espera-se 1 registros retornados', () async {
+      api.httpClient = httpMock;
       var answers = [
         Response(Json.ANIME_LISTA_SATURDAY, 200),
         Response(Json.ANIME_LISTA_SUNDAY, 200)
@@ -64,6 +66,7 @@ void main() {
     });
 
     test('Ao passar como parâmetro domingo(6), espera-se 1 registros retornado', () async {
+      api.httpClient = httpMock;
       var answers = [
         Response(Json.ANIME_LISTA_SUNDAY, 200),
         Response(Json.ANIME_LISTA_VAZIA, 200)
@@ -76,6 +79,7 @@ void main() {
     });
 
     test('Ao passar como parâmetro friday(4), espera-se 2 registros retornados', () async {
+      api.httpClient = httpMock;
       var answers = [
         Response(Json.ANIME_LISTA_VAZIA, 200),
         Response(Json.ANIME_LISTA_SATURDAY, 200)
@@ -91,6 +95,7 @@ void main() {
     });
 
     test('Ao passar como parâmetro saturday(5), espera-se 1 registros retornados', () async {
+      api.httpClient = httpMock;
       var answers = [
         Response(Json.ANIME_LISTA_SATURDAY, 200),
         Response(Json.ANIME_LISTA_SUNDAY, 200)

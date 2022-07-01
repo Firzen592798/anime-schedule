@@ -61,6 +61,28 @@ class SchedulerService{
     return qtdRemovidos;
   }
 
+  Future<int> doRemoveMarksOfAnimesWithEndDateAfterNow([DateTime dateNow]) async{
+    if(dateNow == null){
+      dateNow = DateTime.now();
+    }
+    int qtdRemovidos = 0;
+    int weekday = DateTime.now().weekday - 1;
+    List<AnimeLocal> animesFromLocalStorage = await localService.getMarkedAnimesByDay(weekday);
+    if(animesFromLocalStorage.isNotEmpty){
+      List<AnimeLocal> animesFromAPI = await jikanApiService.findAllByDay(weekday);
+      animesFromLocalStorage.forEach((localAnime) {
+        AnimeLocal anime = animesFromAPI.firstWhere((element) => localAnime.id == element.id);
+        if(anime != null && anime.correctBroadcastEnd != null){
+          if(anime.correctBroadcastEnd.isBefore(dateNow)){
+            localService.removerMarcacaoAnime(anime.id);
+            qtdRemovidos++;
+          }
+        }
+      });
+    }
+    return qtdRemovidos;
+  }
+
   //Pesquisa os animes remotos e verifica se eles estão com a data de broadcast end atualizzada para ser repassada aos registros locais.
   Future<List<AnimeLocal>> doUpdateEndBroadcastOfLocalData([DateTime dateNow]) async{
     List<AnimeLocal> localAnimeData = await localService.getMarkedAnimes();

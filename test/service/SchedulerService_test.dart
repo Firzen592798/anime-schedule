@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:animeschedule/core/Consts.dart';
 import 'package:animeschedule/domain/AnimeLocal.dart';
@@ -6,7 +5,6 @@ import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
 import 'package:animeschedule/service-impl/SchedulerService.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:intl/intl.dart';
 import 'package:mockito/mockito.dart';
 
 class MockLocalStorageService extends Mock implements LocalStorageService{}
@@ -61,13 +59,54 @@ void main() {
       expect(result[0].correctBroadcastStart.day, 3);
       expect(result[0].correctBroadcastTime, "10:00");
       expect(result[0].correctBroadcastDay, "Mondays");
+      expect(result[0].titulo, "T1");
 
       expect(result[1].correctBroadcastEnd.day, 11);
       expect(result[1].correctBroadcastStart.day, 3);
       expect(result[1].correctBroadcastTime, "07:00");
       expect(result[1].correctBroadcastDay, "Saturdays");
+      expect(result[1].titulo, "T2");
+    }); 
+
+    test('Caso não haja nenhum anime remoto, espera-se que a situação se permaneça', () async{
+      List<AnimeLocal> animesRemote = [];
+      
+      List<AnimeLocal> animesLocal = [];
+      animesLocal.add(newAnime(1, "T1", weekday: 0, correctBroadcastTime: "10:00", correctBroadcastStart: DateTime(2022, 6, 11))); 
+      animesLocal.add(newAnime(2, "T2", weekday: 5, correctBroadcastStart: DateTime(2022, 3, 3), correctBroadcastTime: "00:00"));
+      
+      when(jikanApiService.fetchJsonDatafromFile()).thenAnswer((_) async => animesRemote);
+      when(localService.getMarkedAnimes()).thenAnswer((_) async => animesLocal);
+      List<AnimeLocal> result = await schedulerService.doUpdateEndBroadcastOfLocalData();
+      
+      expect(result[0].correctBroadcastEnd.day, 6);
+      expect(result[0].correctBroadcastStart.day, 11);
+      expect(result[0].correctBroadcastTime, "10:00");
+      expect(result[0].correctBroadcastDay, "Mondays");
+      expect(result[0].titulo, "T1");
+
+      expect(result[1].correctBroadcastEnd.day, 11);
+      expect(result[1].correctBroadcastStart.day, 3);
+      expect(result[1].correctBroadcastTime, "00:00");
+      expect(result[1].correctBroadcastDay, "Saturdays");
+      expect(result[1].titulo, "T2");
+    }); 
+
+    test('Caso não haja nenhum anime marcado, espera-se que a situação se permaneça', () async{
+      List<AnimeLocal> animesRemote = [];
+      animesRemote.add(newAnime(1, "T1", weekday: 0, correctBroadcastTime: "10:00")); 
+      animesRemote.add(newAnime(2, "T2", weekday: 5, correctBroadcastTime: "07:00"));
+      
+      List<AnimeLocal> animesLocal = [];
+      
+      when(jikanApiService.fetchJsonDatafromFile()).thenAnswer((_) async => animesRemote);
+      when(localService.getMarkedAnimes()).thenAnswer((_) async => animesLocal);
+      List<AnimeLocal> result = await schedulerService.doUpdateEndBroadcastOfLocalData();
+      
+      expect(result.length, 0);
     }); 
   });
+
 
   group('doRemoveMarksOfFinishedAnimes', () {
 
