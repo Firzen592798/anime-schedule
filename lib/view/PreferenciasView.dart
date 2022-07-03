@@ -1,12 +1,9 @@
+import 'package:animeschedule/core/Toasts.dart';
 import 'package:animeschedule/domain/ConfigPrefs.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
 import 'package:animeschedule/service-impl/SchedulerService.dart';
-import 'package:animeschedule/core/GlobalVar.dart';
-import 'package:animeschedule/core/Toasts.dart';
 import 'package:animeschedule/view/MeusAnimesView.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenciasView extends StatefulWidget {
   @override
@@ -17,10 +14,18 @@ class _PreferenciasViewState extends State<PreferenciasView> {
   TextEditingController usuarioController = new TextEditingController();
   List<String> opcoesNotificacao = [
     'Desabilitar todas',
-    'Notificação de novos episódios todos os dias'
+    'Todos os dias'
   ];
   //List<String> opcoesNotificacao = ['Desabilitar todas', 'Horário fixo', 'Ao sair o episódio'];
   int opcaoSelecionada = 0;
+
+  static const int DESABILITAR_TODAS = 0;
+
+  static const int NOTIFICACAO_DIARIA = 1;
+
+  static const int NOTIFICACAO_POR_EPISODIO = 2;
+
+  static const double CONTAINER_HEIGHT = 70;
 
   String dropdownNotificationTimeValue;
   String dropdownTimeAfterEpisodeValue;
@@ -38,8 +43,8 @@ class _PreferenciasViewState extends State<PreferenciasView> {
     LocalStorageService().getConfigPrefs().then((configPrefs) => {
           setState(() {
             this.opcaoSelecionada = configPrefs.opcaoNotificacao;
-            if (this.opcaoSelecionada > 0) {
-              dropdownNotificationTimeValue = configPrefs.horarioNotificacao;
+            if (this.opcaoSelecionada > DESABILITAR_TODAS) {
+              dropdownNotificationTimeValue = configPrefs.horarioNotificacao ?? "0:00";
               dropdownTimeAfterEpisodeValue =
                   configPrefs.tempoAposOEpisodioParaDispararNotificacao;
             }
@@ -51,11 +56,11 @@ class _PreferenciasViewState extends State<PreferenciasView> {
 
   Widget switchDropdownNotificationTime() {
     switch (opcaoSelecionada) {
-      case 1:
+      case NOTIFICACAO_DIARIA:
         return createDropdownNotificationTime(
             dropdownNotificationTimeListItems);
         break;
-      case 2:
+      case NOTIFICACAO_POR_EPISODIO:
         return createDropdownNotificationTime(
             dropdownTimeAfterEpisodeListItems);
         break;
@@ -66,13 +71,14 @@ class _PreferenciasViewState extends State<PreferenciasView> {
 
   Widget createDropdownNotificationTime(List<String> dropdownItems) {
     return DropdownButton<String>(
-      value: opcaoSelecionada == 1
+
+      value: opcaoSelecionada == NOTIFICACAO_DIARIA
           ? dropdownNotificationTimeValue
           : dropdownTimeAfterEpisodeValue,
       onChanged: (String newValue) {
         setState(() {
           print(newValue);
-          if (opcaoSelecionada == 1) {
+          if (opcaoSelecionada == NOTIFICACAO_DIARIA) {
             dropdownNotificationTimeValue = newValue;
           } else {
             dropdownTimeAfterEpisodeValue = newValue;
@@ -95,63 +101,107 @@ class _PreferenciasViewState extends State<PreferenciasView> {
           title: Text("Preferências"),
         ),
         body: Container(
-          padding: EdgeInsets.all(12),
+          padding: EdgeInsets.symmetric(horizontal: 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              new Container(
-                width: MediaQuery.of(context).size.width,
-                child: TextField(
-                  controller: usuarioController,
-                  decoration: InputDecoration(
-                      border: UnderlineInputBorder(),
-                      labelText: 'Seu usuário do MyAnimeList',
-                      labelStyle: TextStyle(color: Colors.black)),
-                ),
+              Container(
+                height: CONTAINER_HEIGHT,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Usuário do MAL"),
+                    
+                    SizedBox(
+                      width: 120,
+                      height: 30,
+                      child: TextField(
+                        controller: usuarioController,
+                        decoration: InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: '',
+                        ),
+                      ),
+                    ),
+                  ]
+                )
               ),
-              SizedBox(
-                height: 10,
+                
+
+              Divider(
+                indent: 0,
+                height: 0,
+              ),  
+              Container(
+                height: CONTAINER_HEIGHT,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Notificações de episódios"),
+                    DropdownButton<String>(
+                    items: opcoesNotificacao.map((String value) {
+                      return new DropdownMenuItem<String>(
+                        value: value,
+                        child: new Text(value),
+                      );
+                    }).toList(),
+                    value: opcoesNotificacao[opcaoSelecionada],
+                    onChanged: (newVal) {
+                      this.setState(() {
+                        this.opcaoSelecionada = opcoesNotificacao.indexOf(newVal);
+                      });
+                    },
+                  ),
+                  
+                  ]
+                )
               ),
-              Text("Prefências de notificação"),
-              new DropdownButton<String>(
-                items: opcoesNotificacao.map((String value) {
-                  return new DropdownMenuItem<String>(
-                    value: value,
-                    child: new Text(value),
-                  );
-                }).toList(),
-                value: opcoesNotificacao[opcaoSelecionada],
-                onChanged: (newVal) {
-                  this.setState(() {
-                    this.opcaoSelecionada = opcoesNotificacao.indexOf(newVal);
-                  });
-                },
+              Divider(
+                indent: 0,
+                height: 0,
+              ),  
+              Container(
+                height: CONTAINER_HEIGHT,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                  Text("Horário da notificação: "),
+                  switchDropdownNotificationTime(),
+                ],)
               ),
-              switchDropdownNotificationTime(),
-              ElevatedButton(
-                  onPressed: () {
-                    ConfigPrefs configPrefs = ConfigPrefs();
-                    configPrefs.usuarioMAL = usuarioController.text;
-                    configPrefs.opcaoNotificacao = opcaoSelecionada;
-                    configPrefs.tempoAposOEpisodioParaDispararNotificacao =
-                        dropdownTimeAfterEpisodeValue;
-                    configPrefs.horarioNotificacao =
-                        dropdownNotificationTimeValue;
-                    LocalStorageService().salvarPrefs(configPrefs);
-                    if (configPrefs.opcaoNotificacao == 1) {
-                      SchedulerService().scheduleFixedTimeOfDay(
-                          configPrefs.horarioNotificacao);
-                    } else {
-                      SchedulerService().cancelAll();
-                    }
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MeusAnimesView()));
-                    Toasts.mostrarToast("Preferências atualizadas com sucesso");
-                  },
-                  child: Text("Salvar"))
+              Divider(
+                indent: 0,
+                height: 0,
+              ),  
+              Container(
+                width: double.infinity,
+                height: 40,
+                child: ElevatedButton(
+                    onPressed: () {
+                      ConfigPrefs configPrefs = ConfigPrefs();
+                      configPrefs.usuarioMAL = usuarioController.text;
+                      configPrefs.opcaoNotificacao = opcaoSelecionada;
+                      configPrefs.tempoAposOEpisodioParaDispararNotificacao =
+                          dropdownTimeAfterEpisodeValue;
+                      configPrefs.horarioNotificacao =
+                          dropdownNotificationTimeValue;
+                      LocalStorageService().salvarPrefs(configPrefs);
+                      if (configPrefs.opcaoNotificacao == NOTIFICACAO_DIARIA) {
+                        SchedulerService().scheduleFixedTimeOfDay(
+                            configPrefs.horarioNotificacao);
+                      } else {
+                        SchedulerService().cancelAll();
+                      }
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MeusAnimesView()));
+                      Toasts.mostrarToast("Preferências atualizadas com sucesso");
+                    },
+                    child: Text("Salvar")),
+              )
             ],
           ),
         ));

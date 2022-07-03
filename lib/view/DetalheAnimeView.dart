@@ -1,3 +1,4 @@
+import 'package:animeschedule/core/CustomColors.dart';
 import 'package:animeschedule/model/AnimeApi.dart';
 import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service/IAnimeApiService.dart';
@@ -28,12 +29,14 @@ class _DetalheAnimeViewState extends State<DetalheAnimeView> {
 
   bool isChanged = false;
 
+  bool isLoading = true;
+
   @override
   Future<void> initState() {
     anime = widget.anime;
-    
     jikanApiService.loadAnimeDetails(widget.anime.id).then((value) {
       setState(() {
+        isLoading = false;
          anime.animeDetails = value;
       });
      
@@ -97,83 +100,109 @@ class _DetalheAnimeViewState extends State<DetalheAnimeView> {
               width: double.infinity,
               
               height: 300,
-              child: anime.animeDetails != null ? Image(
+              child:  Image(
                 image: NetworkImage(anime.urlImagem),
-              ) : SizedBox.shrink(),
+              ) 
             ),
             
-            1 == 1 ? SizedBox.shrink(): ListTile(
-              leading: Icon(Icons.tv_outlined),
-              title: Text(
-                "Número de episódios: "+ anime.episodios.toString()
-              ),
-            ),
-
             ListTile(
               leading: Icon(Icons.access_alarm_outlined),
               title: Text(
                 "Transmissão nas ${anime.correctBroadcastDay} às ${anime.correctBroadcastTime}"
               ),
             ),
-            anime.animeDetails != null ? ListTile(
-              leading: Icon(Icons.info_outline),
-              title: Text(
-                anime?.animeDetails?.synopsis,
-                textAlign: TextAlign.justify,
-              ),
-            ) :SizedBox.shrink() ,
-            anime.animeDetails != null ? ListTile(
-              leading: Icon(Icons.extension_outlined),
-              title: Text(
-                "Gêneros: "+anime.animeDetails.genres.join(", ")
-              ),
-            ) : SizedBox.shrink(),
-            anime.animeDetails != null ? ListTile(
-              leading: Icon(Icons.business_outlined),
-              title: Text(
-                "Estúdios: "+anime.animeDetails.studios.join(", ")
-              ),
-            ) : SizedBox.shrink(),
-
-            anime.animeDetails != null ? ListTile(
-              leading: Icon(Icons.music_video_outlined),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Aberturas"),
-                  Text(
-                    anime.animeDetails.openings.join("\n"),
-                    style: TextStyle(
-                      height: 1.7,
-                      fontSize: 12
-                    ),
+            
+            !isLoading ? Column(
+              children: [
+                anime.animeDetails != null ? ListTile(
+                  leading: Icon(Icons.info_outline),
+                  title: Text(
+                    anime?.animeDetails?.synopsis,
+                    textAlign: TextAlign.justify,
                   ),
-                ],
-              ),
-            ) : SizedBox.shrink(),
-
-            anime.animeDetails != null ? ListTile(
-              leading: Icon(Icons.music_note_outlined),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Encerramentos"),
-                  Text(
-                    anime.animeDetails.endings.join("\n"),
-                    style: TextStyle(
-                      height: 1.7,
-                      fontSize: 12
-                    ),
+                ) :SizedBox.shrink() ,
+                anime.animeDetails != null ? ListTile(
+                  leading: Icon(Icons.extension_outlined),
+                  title: Text(
+                    "Gêneros: "+anime.animeDetails.genres.join(", ")
                   ),
-                ],
-              ),
-            ) : SizedBox.shrink(),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(16),
-              child: ElevatedButton(onPressed: voltar, 
-                child: Text("Voltar")
-              ),
+                ) : SizedBox.shrink(),
+                anime.animeDetails != null ? ListTile(
+                  leading: Icon(Icons.business_outlined),
+                  title: Text(
+                    "Estúdios: "+anime.animeDetails.studios.join(", ")
+                  ),
+                ) : SizedBox.shrink(),
+
+                anime.animeDetails != null ? ListTile(
+                  leading: Icon(Icons.music_video_outlined),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Aberturas"),
+                      Text(
+                        anime.animeDetails.openings.join("\n"),
+                        style: TextStyle(
+                          height: 1.7,
+                          fontSize: 12
+                        ),
+                      ),
+                    ],
+                  ),
+                ) : SizedBox.shrink(),
+
+                anime.animeDetails != null ? ListTile(
+                  leading: Icon(Icons.music_note_outlined),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Encerramentos"),
+                      Text(
+                        anime.animeDetails.endings.join("\n"),
+                        style: TextStyle(
+                          height: 1.7,
+                          fontSize: 12
+                        ),
+                      ),
+                    ],
+                  ),
+                ) : SizedBox.shrink(),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(16),
+                  child: ElevatedButton(onPressed: voltar, 
+                    child: Text("Voltar")
+                  ),
+                )
+              ],
+            ):Container(
+              child: Column(children: [
+                Container(
+                  color: CustomColors.skeletonColor,
+                  width: double.infinity,
+                  height: 20,
+                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 25)
+                ),
+                Container(
+                  color: CustomColors.skeletonColor,
+                  width: double.infinity,
+                  height: 20,
+                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 25)
+                ),
+                Container(
+                  color: CustomColors.skeletonColor,
+                  width: double.infinity,
+                  height: 20,
+                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 25)
+                ),
+                Container(
+                  color: CustomColors.skeletonColor,
+                  width: double.infinity,
+                  height: 80,
+                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 25)
+                )
+                
+              ]),
             )
           ]
       

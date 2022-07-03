@@ -154,7 +154,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
           SizedBox(
             width: double.infinity,
             height: MediaQuery.of(context).size.height-130,
-            child: ListView.separated(
+            child: ListView.builder(
               itemCount: _listaAnimes.length,
               itemBuilder: (BuildContext context, int index) {
                 return (_listaAnimes[index].marcado || !showOnlyMarkedAnimes) ? GestureDetector(
@@ -168,12 +168,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
                   ),
                 ): SizedBox.shrink();
               },
-              separatorBuilder: (context, index) {
-                return Divider(
-                  indent: 0,
-                  height: 0,
-                );
-              },
+
             ),
           ),
         ],

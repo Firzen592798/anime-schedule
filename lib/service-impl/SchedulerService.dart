@@ -5,7 +5,6 @@ import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
 import 'package:animeschedule/service-impl/NotificationService.dart';
 import 'package:animeschedule/service/IAnimeApiService.dart';
-import '../model/AnimeApi.dart';
 import '../service/ILocalStorageService.dart';
 
 class SchedulerService{

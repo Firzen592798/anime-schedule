@@ -45,59 +45,68 @@ class _AnimeListItemState extends State<AnimeListItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return 
+    Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 1,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 1,
+                  ),
+                ),
+                child: Image(
+                    alignment: Alignment.center,
+                    height: 80,
+                    width: 80,
+                    isAntiAlias: true,
+                    fit: BoxFit.cover,
+                    image: NetworkImage(widget.anime.urlImagem)),
               ),
             ),
-            child: Image(
-                alignment: Alignment.center,
-                height: 80,
-                width: 80,
-                isAntiAlias: true,
-                fit: BoxFit.cover,
-                image: NetworkImage(widget.anime.urlImagem)),
-          ),
+            Expanded(
+                child: Padding(
+              padding: EdgeInsets.only(left: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.anime.titulo),
+                  Text(
+                    widget.anime.correctBroadcastTime,
+                    style: AppTheme().themedata.textTheme.bodySmall,
+                  ),
+                  Text(
+                    "Transmissão: ${widget.anime.transmissionRange}",
+                    style: AppTheme().themedata.textTheme.bodySmall.copyWith(fontSize: 14),
+                  ),
+                ],
+              ),
+            )),
+            IconButton(
+              icon: !widget.anime.marcado
+                  ? const Icon(Icons.star_outline)
+                  : const Icon(Icons.star),
+              tooltip: !widget.anime.marcado
+                  ? 'Marcar como Assistindo'
+                  : 'Remover marcação',
+              onPressed: () {
+                if (!widget.anime.marcado) {
+                  _marcar();
+                } else {
+                  _desmarcar();
+                }
+              },
+            )
+          ],
         ),
-        Expanded(
-            child: Padding(
-          padding: EdgeInsets.only(left: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(widget.anime.titulo),
-              Text(
-                widget.anime.correctBroadcastTime,
-                style: AppTheme().themedata.textTheme.bodySmall,
-              ),
-              Text(
-                "Transmissão: ${widget.anime.transmissionRange}",
-                style: AppTheme().themedata.textTheme.bodySmall.copyWith(fontSize: 14),
-              ),
-            ],
-          ),
-        )),
-        IconButton(
-          icon: !widget.anime.marcado
-              ? const Icon(Icons.star_outline)
-              : const Icon(Icons.star),
-          tooltip: !widget.anime.marcado
-              ? 'Marcar como Assistindo'
-              : 'Remover marcação',
-          onPressed: () {
-            if (!widget.anime.marcado) {
-              _marcar();
-            } else {
-              _desmarcar();
-            }
-          },
-        )
+        Divider(
+          indent: 0,
+          height: 0,
+        )   
       ],
     );
   }
