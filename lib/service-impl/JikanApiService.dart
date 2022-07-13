@@ -1,5 +1,4 @@
 import 'package:animeschedule/model/AnimeApi.dart';
-import 'package:animeschedule/core/ApiResponse.dart';
 import 'package:animeschedule/core/Properties.dart';
 import 'package:animeschedule/service/IAnimeApiService.dart';
 import 'package:http/http.dart' show Client, Response;
@@ -28,24 +27,6 @@ class JikanApiService implements IAnimeAPiService{
   List<AnimeLocal> animeListInMemory = [];
 
   List<bool> _isDayLoaded = [false, false, false, false, false, false, false];
-
-  Future<ApiResponse<List<AnimeApi>>> listarAnimesUsuario(usuarioMal) async{
-
-    String url = Properties.URL_API_CONSULTA + "/user/"+usuarioMal+"/animelist/watching";    
-    Response response = await _httpClient.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      var dadosJson = json.decode(response.body);
-      List<AnimeApi> lista = [];
-      for (var item in dadosJson['anime']) {
-        //print(item);
-        AnimeApi anime = AnimeApi.fromJson(item);
-        lista.add(anime);
-      }
-      return ApiResponse<List<AnimeApi>>(data: lista, isError: false);
-    }else{
-      return ApiResponse<List<AnimeApi>>(data: null, isError: true, errorMessage: "Erro ao recuperar os animes");
-    }
-  }
 
   Future<List<AnimeLocal>> fetchJsonDatafromFile() async {
       var jsonText = await rootBundle.loadString('assets/schedule.json');

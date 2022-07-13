@@ -17,4 +17,8 @@ abstract class ILocalStorageService{
   Future<List<AnimeLocal>> getMarkedAnimesByDay(int day);
 
   void removerMarcacaoAnimesFinalizados([DateTime dateTime]);
+
+  Future<String> saveToken(String token);
+
+  Future<String> getToken();
 }

@@ -105,4 +105,22 @@ class LocalStorageService implements ILocalStorageService{
     });
     return animelistStr;
   }
+
+  @override
+  Future<String> saveToken (String token) async{
+    Map<String, dynamic> tokenMap = jsonDecode(token);
+    await SharedPreferences.getInstance().then((prefs) {
+      prefs.setString("token", tokenMap["access_token"]);
+      prefs.setString("refreshToken", tokenMap["refresh_token"]);
+    });
+    return tokenMap["access_token"];
+  }
+
+  Future<String> getToken() async {
+    String token;
+    await SharedPreferences.getInstance().then((prefs) {
+      token = prefs.getString("token");
+    });
+    return token;
+  }
 }

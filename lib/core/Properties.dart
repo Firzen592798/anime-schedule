@@ -14,7 +14,9 @@ class Properties {
   static const CLIENT_SECRET = "xxx";
   static const XAPI_KEY = "xxx";
   static const URL_API_CONSULTA = "https://api.jikan.moe/v4";
+  static const URL_API_MAL = "https://api.myanimelist.net/v2";
   static const URL_API_AUTENTICACAO = "https://myanimelist.net/v1/oauth2/authorize";
+  static const URL_API_TOKEN = "https://myanimelist.net/v1/oauth2/token";
   static const URL_REDIRECT = "http://localhost/oauth";
   static const STATE = "1F0DD5735849BE6B3AA17E7B77DCC4D2D4974A1A25B7F875CC7CAB818A7A9B8A";
 }

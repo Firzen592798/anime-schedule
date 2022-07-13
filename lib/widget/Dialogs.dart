@@ -1,4 +1,4 @@
-import 'package:animeschedule/core/GlobalVar.dart';
+import 'package:animeschedule/core/Globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

@@ -1,6 +1,9 @@
 import 'package:animeschedule/core/ApiResponse.dart';
+import 'package:animeschedule/core/Globals.dart';
+import 'package:animeschedule/core/Toasts.dart';
 import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
+import 'package:animeschedule/service-impl/MALService.dart';
 import 'package:animeschedule/service-impl/NotificationService.dart';
 import 'package:animeschedule/service/IAnimeApiService.dart';
 import 'package:animeschedule/service/ILocalStorageService.dart';
@@ -22,6 +25,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
   List<AnimeLocal> _listaAnimes = [];
   List<AnimeLocal> _listaAnimesUsuario;
   IAnimeAPiService _apiService = JikanApiService();
+  MALService _malService = MALService();
 
   int selectedDay = 0;
 
@@ -41,36 +45,27 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
   _carregarAnimes() async{
     String usuarioMAL = "";
     List<AnimeLocal> dailyAnimeList = await _apiService.findAllByDay(selectedDay);
-      //Se tiver usuário do MAL logado, o código puxa a lista dos animes marcados como watching no mal
-      if(usuarioMAL != ""){
-        if(_listaAnimesUsuario == null){
-          ApiResponse responseUsuario = await _apiService.listarAnimesUsuario(usuarioMAL);
-          if(!responseUsuario.isError){
-            _listaAnimesUsuario = responseUsuario.data;
-          }
-        }
-        _listaAnimes = [];
-        
-        for(int j = 0; j < dailyAnimeList.length; j++){
-          AnimeLocal animeDia = dailyAnimeList[j];
-          
-          for(int i = 0; i < _listaAnimesUsuario.length; i++){
-            if(_listaAnimesUsuario[i].id == animeDia.id){               
-              _listaAnimes.add(animeDia);
-            }
-          }
-        }
-      }else{ //se não tiver usuário logado, puxa os animes do local storage que foram marcados como assistindo.
-        List<AnimeLocal> favoriteAnimeList = await localService.getMarkedAnimes();
-        dailyAnimeList.where((element) => element.id > 0).forEach((element) {
-          if(favoriteAnimeList.any((favorite) => favorite.id == element.id)){
-            element.marcado = true;
-          }
-        });
-        setState(() {
-          _listaAnimes = dailyAnimeList;
-        });
+    List<AnimeLocal> favoriteAnimeList = await localService.getMarkedAnimes();
+    syncAnimeMarks(dailyAnimeList, favoriteAnimeList);
+    setState(() {
+      _listaAnimes = dailyAnimeList;
+    });
+      
+  }
+
+  syncAnimeMarks(List<AnimeLocal>  dailyAnimeList, List<AnimeLocal> favoriteAnimeList){
+    dailyAnimeList.where((element) => element.id > 0).forEach((element) {
+      if(favoriteAnimeList.any((favorite) => favorite.id == element.id)){
+        element.marcado = true;
       }
+    });
+  }
+
+  _updateFavoriteAnimes() async {
+    List<AnimeLocal> userAnnimeList = await _malService.getUserWatchingAnimeList(GlobalVar().token);
+    localService.atualizarMarcacoes(userAnnimeList);
+    syncAnimeMarks(_listaAnimes, userAnnimeList);
+    Toasts.mostrarToast("Animes sincronizados com sucesso");
   }
 
   _marcar(AnimeLocal anime){
@@ -98,6 +93,18 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Lista de animes"),
+        actions: [
+           Padding(
+            padding: EdgeInsets.only(right: 20.0),
+            child: GestureDetector(
+              onTap: _updateFavoriteAnimes,
+              child: Icon(
+                Icons.refresh,
+                size: 26.0,
+              ),
+            )
+          ),
+        ],
       ),
       drawer: MenuLateral(context),
       body: Column(

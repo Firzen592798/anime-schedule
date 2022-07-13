@@ -9,6 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../json.dart';
+
 class MockJikanApiService extends Mock implements JikanApiService{}
 
 class MockLocalStorageService extends Mock implements ILocalStorageService{}
@@ -198,7 +200,7 @@ void main() {
   });
 
   group("atualizarMarcacoes", () {
-    test("", () async {
+    test("Espera-se que as atualizações sejam atualizadas", () async {
       setInitialMockValues(qtd: 1);
       List<AnimeLocal> animes = [newAnime(1, "N1")];
       await localStorageService.atualizarMarcacoes(animes);
@@ -209,6 +211,26 @@ void main() {
         expect("06/06/2022", DateFormat("dd/MM/yyyy").format(savedAnime.correctBroadcastEnd));
         expect("03/03/2022", DateFormat("dd/MM/yyyy").format(savedAnime.correctBroadcastStart));
       });
+    });
+  });
+
+  group("saveToken", () {
+    test("Ao salvar o token, espera-se que seja retornado o token correto", () async {
+      String token = await localStorageService.saveToken(Json.TOKEN);
+      expect(token, "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNTM4ODc5OTNjNzY4YTk1ZTVjODdiNjdiNzdiZGI0ZTNlNTc3NTUxMmQ2YWVjMjg1MDU1NzhiYTk1NTEzZDk0ZDUzZjUxNTRjOTVjZjgyIn0.eyJhdWQiOiIzZjIzNjJjM2I0NTEzNTE5MDE1ODNjNDE4MmE5Nzk0NSIsImp0aSI6ImNlNTM4ODc5OTNjNzY4YTk1ZTVjODdiNjdiNzdiZGI0ZTNlNTc3NTUxMmQ2YWVjMjg1MDU1NzhiYTk1NTEzZDk0ZDUzZjUxNTRjOTVjZjgyIiwiaWF0IjoxNjU3MjQxNTAwLCJuYmYiOjE2NTcyNDE1MDAsImV4cCI6MTY1OTkxOTkwMCwic3ViIjoiMTE3OTk1MyIsInNjb3BlcyI6W119.L9jPNA8dgSKQ27Lx2LLNY89xnhdn5ngBkvA6CT_02oe1G9huhRv15tP-2KeepiLH14R7_eTQ1Wmit3YOUVeR52nOggfzetwGDY_qPjl0QjYURDeDNyVuOUiT0qs_XmC-NAte27m8mBZ-MWeRfKxbmq9-o2XtMYKe3QZ9dPgCXaHF3Ha6CvFOCVksBmQTcjK-eBKi_mOxUzvdY8fbp9KFmgQQ9yC-gjBlu4VxaxdRAQmI-tmK6Q-7b0kuiYdDAN-hRibPWmZEOiS_sF2818hQNvgM0XwXQdCSaoOyYS5rJeNgUjrtU_0chAUBbGpH5sODZUkTzDkJNhnCm6yPceHvgA");
+      SharedPreferences.getInstance().then((prefs) {
+         expect(true, prefs.getString("refreshToken").startsWith("def502008fec9922"));
+         expect(true, prefs.getString("token").startsWith("eyJ0eXAiOiJKV1QiLCJhbGc"));
+      });
+    });
+  });
+
+  group("getToken",() {
+    test("Ao chamar o token, espera-se que seja retornado o token correto", () async {
+      await localStorageService.saveToken(Json.TOKEN);
+      String token = await localStorageService.getToken();
+      expect(true, token.startsWith("eyJ0eXAiOiJKV1QiLCJhbGc"));
+
     });
   });
 }

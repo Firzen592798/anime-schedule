@@ -1231,4 +1231,136 @@ class Json {
     ]
   }
     ''';
+
+  static const String LIST_BY_USER = '''
+    {
+      "data": [
+          {
+              "node": {
+                  "id": 40507,
+                  "title": "Arifureta Shokugyou de Sekai Saikyou 2nd Season",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1877/119668.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1877/119668l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 34566,
+                  "title": "Boruto: Naruto Next Generations",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/9/84460.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/9/84460l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 48675,
+                  "title": "Kakkou no Iinazuke",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1285/120529.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1285/120529l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 42963,
+                  "title": "Kanojo, Okarishimasu 2nd Season",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1070/124592.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1070/124592l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 45613,
+                  "title": "Kawaii dake ja Nai Shikimori-san",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1995/121695.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1995/121695l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 51213,
+                  "title": "Kinsou no Vermeil: Gakeppuchi Majutsushi wa Saikyou no Yakusai to Mahou Sekai wo Tsukisusumu",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1750/123724.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1750/123724l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 41084,
+                  "title": "Made in Abyss: Retsujitsu no Ougonkyou",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1864/122519.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1864/122519l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 21,
+                  "title": "One Piece",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/6/73245.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/6/73245l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 40351,
+                  "title": "Pokemon (2019)",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1689/105554.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1689/105554l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 49160,
+                  "title": "Shachiku-san wa Youjo Yuurei ni Iyasaretai.",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1190/121945.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1190/121945l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 50346,
+                  "title": "Yofukashi no Uta",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1045/123711.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1045/123711l.jpg"
+                  }
+              }
+          },
+          {
+              "node": {
+                  "id": 51096,
+                  "title": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e (TV) 2nd Season",
+                  "main_picture": {
+                      "medium": "https://api-cdn.myanimelist.net/images/anime/1010/124180.jpg",
+                      "large": "https://api-cdn.myanimelist.net/images/anime/1010/124180l.jpg"
+                  }
+              }
+          }
+      ],
+      "paging": {}
+  }
+  ''';
+
+  static const String TOKEN = '''
+    {"token_type":"Bearer","expires_in":2678400,"access_token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNTM4ODc5OTNjNzY4YTk1ZTVjODdiNjdiNzdiZGI0ZTNlNTc3NTUxMmQ2YWVjMjg1MDU1NzhiYTk1NTEzZDk0ZDUzZjUxNTRjOTVjZjgyIn0.eyJhdWQiOiIzZjIzNjJjM2I0NTEzNTE5MDE1ODNjNDE4MmE5Nzk0NSIsImp0aSI6ImNlNTM4ODc5OTNjNzY4YTk1ZTVjODdiNjdiNzdiZGI0ZTNlNTc3NTUxMmQ2YWVjMjg1MDU1NzhiYTk1NTEzZDk0ZDUzZjUxNTRjOTVjZjgyIiwiaWF0IjoxNjU3MjQxNTAwLCJuYmYiOjE2NTcyNDE1MDAsImV4cCI6MTY1OTkxOTkwMCwic3ViIjoiMTE3OTk1MyIsInNjb3BlcyI6W119.L9jPNA8dgSKQ27Lx2LLNY89xnhdn5ngBkvA6CT_02oe1G9huhRv15tP-2KeepiLH14R7_eTQ1Wmit3YOUVeR52nOggfzetwGDY_qPjl0QjYURDeDNyVuOUiT0qs_XmC-NAte27m8mBZ-MWeRfKxbmq9-o2XtMYKe3QZ9dPgCXaHF3Ha6CvFOCVksBmQTcjK-eBKi_mOxUzvdY8fbp9KFmgQQ9yC-gjBlu4VxaxdRAQmI-tmK6Q-7b0kuiYdDAN-hRibPWmZEOiS_sF2818hQNvgM0XwXQdCSaoOyYS5rJeNgUjrtU_0chAUBbGpH5sODZUkTzDkJNhnCm6yPceHvgA","refresh_token":"def502008fec992240f2b9103ea170e455f5b728626542bb39d1fd36a63f9b33962d310b321d841bf08976135e96ca3529e68d526b66fffa72785b83d3228caca3911ebc7d49bc3477cd614381aeea"}
+  ''';
 }
