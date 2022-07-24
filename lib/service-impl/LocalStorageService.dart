@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:animeschedule/core/Globals.dart';
 import 'package:animeschedule/domain/ConfigPrefs.dart';
 import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/Consts.dart';
 import '../domain/AnimeLocal.dart';
+import '../domain/User.dart';
 
 /// Service para gerenciar o armazenamento dos dados em local storage 
 class LocalStorageService implements ILocalStorageService{
@@ -20,7 +22,6 @@ class LocalStorageService implements ILocalStorageService{
   Future<ConfigPrefs> getConfigPrefs(){
     return SharedPreferences.getInstance().then((prefs) {
       ConfigPrefs config = ConfigPrefs(); 
-      config.usuarioMAL =  prefs.getString("usuarioMAL") ?? "";
       config.opcaoNotificacao =  prefs.getInt("opcaoNotificacao") ?? 1;
       config.horarioNotificacao =  prefs.getString("horarioNotificacao") ?? null;
       config.tempoAposOEpisodioParaDispararNotificacao =  prefs.getString("tempoAposOEpisodioParaDispararNotificacao") ?? null;
@@ -89,6 +90,7 @@ class LocalStorageService implements ILocalStorageService{
 
   Future<List<AnimeLocal>> getMarkedAnimesByDay(int day) async {
     List<AnimeLocal> animeList = await getMarkedAnimes();
+    print(animeList);
     animeList = animeList.where((element) => (element.correctBroadcastDay == Consts.diasSemanaListaCapitalized[day])).toList();
     animeList.sort();
     return animeList;
@@ -104,6 +106,30 @@ class LocalStorageService implements ILocalStorageService{
       prefs.setStringList("animeList", animelistStr);
     });
     return animelistStr;
+  }
+  
+  @override
+  Future<String> saveUser (User user) async{
+    print("saveUser");
+    String data = jsonEncode(user.toJson());
+    print(data);
+    await SharedPreferences.getInstance().then((prefs) {
+      prefs.setString("user", data);
+    });
+    return data;
+  }
+
+  @override
+  Future<User> getUser() async {
+    String data;
+    User user = null;
+    await SharedPreferences.getInstance().then((prefs) {
+      data = prefs.getString("user");
+      if(data != null){
+        user = User.fromJson(jsonDecode(data));
+      }
+    });
+    return user;
   }
 
   @override
@@ -122,5 +148,33 @@ class LocalStorageService implements ILocalStorageService{
       token = prefs.getString("token");
     });
     return token;
+  }
+
+  Future<void> deslogar() async{
+    await SharedPreferences.getInstance().then((prefs) {
+      GlobalVar().user = null;
+      GlobalVar().token = null;
+      GlobalVar().refreshTOken = null;
+      GlobalVar().firstMalLogin = false;
+      prefs.remove("token");
+      prefs.remove("refreshToken");
+      prefs.remove("user");
+      prefs.remove("animeList");
+    });
+    return;
+  }
+
+  void printStorage(){
+    SharedPreferences.getInstance().then((prefs) {
+      print("STORAGE DATA");
+      print("TOKEN");
+      print(prefs.getString("token"));
+      print("REFRESHTOKEN");
+      print(prefs.getString("refreshToken"));
+      print("USER");
+      print(prefs.getString("user"));
+      print("ANIMELIST");
+      print(prefs.getStringList("animeList"));
+    });
   }
 }

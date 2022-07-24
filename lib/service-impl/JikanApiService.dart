@@ -117,6 +117,16 @@ class JikanApiService implements IAnimeAPiService{
     String loadedData = await loadFromURL(url);
     var dadosJson = json.decode(loadedData);
     AnimeDetails details = AnimeDetails.fromJson(dadosJson);
+    print(details);
     return  details;
+  }
+  
+  @override
+  Future<List<AnimeLocal>> findAll() async {
+    String url = Properties.URL_API_CONSULTA + "/schedules?limit=4000";
+    String loadedData = await loadFromURL(url);
+    animeListInMemory = AnimeMapper.convertAnimeRemoteToAnimeLocal(_parseJsonAnimeData(loadedData));
+     _isDayLoaded = [true, true, true, true, true, true, true];
+    return animeListInMemory;
   }
 }

@@ -5,6 +5,8 @@ import 'package:animeschedule/service-impl/SchedulerService.dart';
 import 'package:animeschedule/view/MeusAnimesView.dart';
 import 'package:flutter/material.dart';
 
+import '../core/Globals.dart';
+
 class PreferenciasView extends StatefulWidget {
   @override
   _PreferenciasViewState createState() => _PreferenciasViewState();
@@ -48,7 +50,6 @@ class _PreferenciasViewState extends State<PreferenciasView> {
               dropdownTimeAfterEpisodeValue =
                   configPrefs.tempoAposOEpisodioParaDispararNotificacao;
             }
-            this.usuarioController.text = configPrefs.usuarioMAL;
           })
         });
     super.initState();
@@ -115,12 +116,8 @@ class _PreferenciasViewState extends State<PreferenciasView> {
                     SizedBox(
                       width: 120,
                       height: 30,
-                      child: TextField(
-                        controller: usuarioController,
-                        decoration: InputDecoration(
-                          border: UnderlineInputBorder(),
-                          labelText: '',
-                        ),
+                      child: Text(
+                        GlobalVar().user?.name ?? "Não logado"
                       ),
                     ),
                   ]
@@ -181,7 +178,6 @@ class _PreferenciasViewState extends State<PreferenciasView> {
                 child: ElevatedButton(
                     onPressed: () {
                       ConfigPrefs configPrefs = ConfigPrefs();
-                      configPrefs.usuarioMAL = usuarioController.text;
                       configPrefs.opcaoNotificacao = opcaoSelecionada;
                       configPrefs.tempoAposOEpisodioParaDispararNotificacao =
                           dropdownTimeAfterEpisodeValue;
@@ -189,8 +185,7 @@ class _PreferenciasViewState extends State<PreferenciasView> {
                           dropdownNotificationTimeValue;
                       LocalStorageService().salvarPrefs(configPrefs);
                       if (configPrefs.opcaoNotificacao == NOTIFICACAO_DIARIA) {
-                        SchedulerService().scheduleFixedTimeOfDay(
-                            configPrefs.horarioNotificacao);
+                        SchedulerService().scheduleFixedTimeOfDay(configPrefs.horarioNotificacao);
                       } else {
                         SchedulerService().cancelAll();
                       }

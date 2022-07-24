@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:animeschedule/core/ApiResponse.dart';
 import 'package:animeschedule/core/Properties.dart';
+import 'package:animeschedule/domain/User.dart';
 import 'package:http/http.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
@@ -44,13 +46,10 @@ class MALService {
         codeChallenge +
         "&state=" +
         Properties.STATE;
-    //print(authorizationUrl);
-    //print("Code challenge: "+codeChallenge);
     return authorizationUrl;
   }
 
   Future<String> generateToken(String authCode) async {
-    print("Auth code: "+authCode);
     Map<String, String> headers = {
       "Accept": "application/json",
       "Content-Type": "application/x-www-form-urlencoded"
@@ -82,7 +81,6 @@ class MALService {
   Future<List<AnimeLocal>> getUserWatchingAnimeList(String token) async{
     List<AnimeLocal> animeData = [];
     String url = Properties.URL_API_MAL + "/users/@me/animelist?status=watching&limit=150";
-    print(url);
     String loadedData = await loadFromURL(url, token);
     var dadosJson = jsonDecode(loadedData);
     for (var item in dadosJson["data"]) {
@@ -95,8 +93,24 @@ class MALService {
     return animeData;
   }
 
+  Future<ApiResponse<User>> getUserData(String token) async{
+    String url = Properties.URL_API_MAL + "/users/@me?fields=anime_statistics";
+    ApiResponse<User> response;
+    try{
+      String loadedData = await loadFromURL(url, token);
+      var dadosJson = jsonDecode(loadedData);
+      User user = User.fromJson(dadosJson);
+      response = ApiResponse(data: user, isError: false);
+    }catch(error){
+      response = ApiResponse(data: error, isError: true, errorMessage: 'Erro ao obter dados');
+    }
+    
+    return response;
+  }
+
   Future<String> loadFromURL(String url, String token) async{
     Response response;
+    print(url);
     print(token);
     response = await _httpClient.get(
       Uri.parse(url),
@@ -105,11 +119,8 @@ class MALService {
       }
     );
     if(response.statusCode == 200){
-      print(response.body);
       return response.body;
     }else{
-      print(response.statusCode);
-      print(response.headers);
       throw Exception(response.body);
     }
   }

@@ -1,3 +1,4 @@
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:animeschedule/themes/AppTheme.dart';
 import 'package:animeschedule/view/LoginView.dart';
 import 'package:animeschedule/view/MeusAnimesView.dart';
@@ -8,8 +9,8 @@ import 'service-impl/NotificationService.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AndroidAlarmManager.initialize();
   await NotificationService().initPlugin();
-  
   runApp(MyApp());
 }
 
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: AppTheme().themedata,
       debugShowCheckedModeBanner: false,
-      home: LoginView(),
+      home: MeusAnimesView(),
             routes: {
         //'/test': (_) => SearchTest(),
         '/login': (_) => LoginView(),

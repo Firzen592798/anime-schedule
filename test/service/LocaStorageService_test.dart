@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:animeschedule/domain/AnimeLocal.dart';
+import 'package:animeschedule/domain/User.dart';
 import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service-impl/LocalStorageService.dart';
 import 'package:animeschedule/service/ILocalStorageService.dart';
@@ -230,6 +231,40 @@ void main() {
       await localStorageService.saveToken(Json.TOKEN);
       String token = await localStorageService.getToken();
       expect(true, token.startsWith("eyJ0eXAiOiJKV1QiLCJhbGc"));
+
+    });
+  });
+
+  group("saveUser", () {
+    test("Ao salvar o usuário, espera-se que seja retornado o usuário correto", () async {
+      User user = new User();
+      user.id = 1;
+      user.picture = "https://api-cdn.myanimelist.net/images/userimages/1179953.jpg?t=1658088000";
+      user.name = "Firzen592798";
+      await localStorageService.saveUser(user);
+      String savedData;
+      await SharedPreferences.getInstance().then((prefs) {
+        savedData = prefs.getString("user");
+      });
+      User response = User.fromJson(jsonDecode(savedData));
+      expect(1, response.id);
+      expect("Firzen592798", response.name);
+      expect("https://api-cdn.myanimelist.net/images/userimages/1179953.jpg?t=1658088000", response.picture);
+    });
+  });
+
+  group("getUser",() {
+    test("Ao chamar o getUser, espera-se que seja retornado o objeto do usuário", () async {
+      User user = new User();
+      user.id = 1;
+      user.picture = "https://api-cdn.myanimelist.net/images/userimages/1179953.jpg?t=1658088000";
+      user.name = "Firzen592798";
+
+      SharedPreferences.setMockInitialValues({"user": jsonEncode(user.toJson())});
+      User response  = await localStorageService.getUser();
+      expect(1, response.id);
+      expect("Firzen592798", response.name);
+      expect("https://api-cdn.myanimelist.net/images/userimages/1179953.jpg?t=1658088000", response.picture);
 
     });
   });

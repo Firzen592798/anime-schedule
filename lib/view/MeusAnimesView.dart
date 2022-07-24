@@ -23,7 +23,6 @@ class MeusAnimesView extends StatefulWidget {
 class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   List<AnimeLocal> _listaAnimes = [];
-  List<AnimeLocal> _listaAnimesUsuario;
   IAnimeAPiService _apiService = JikanApiService();
   MALService _malService = MALService();
 
@@ -37,20 +36,46 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   @override
   initState() {
+    
     super.initState();
     selectedDay = (DateTime.now().weekday - 1) % 7;
     _carregarAnimes();
   }
 
   _carregarAnimes() async{
-    String usuarioMAL = "";
-    List<AnimeLocal> dailyAnimeList = await _apiService.findAllByDay(selectedDay);
-    List<AnimeLocal> favoriteAnimeList = await localService.getMarkedAnimes();
-    syncAnimeMarks(dailyAnimeList, favoriteAnimeList);
-    setState(() {
-      _listaAnimes = dailyAnimeList;
+    print("carregarAnimes");
+    if(GlobalVar().isFirstMalLogin == true){
+      print("FirstMalLogin");
+      GlobalVar().firstMalLogin = false;
+      await syncWithMyAnimeList();
+    }else{
+      List<AnimeLocal> dailyAnimeList = await _apiService.findAllByDay(selectedDay);
+      List<AnimeLocal> favoriteAnimeList = await localService.getMarkedAnimes();
+      syncAnimeMarks(dailyAnimeList, favoriteAnimeList);
+      setState(() {
+        _listaAnimes = dailyAnimeList;
+      });
+    }
+  }
+
+  syncWithMyAnimeList(){
+    List<AnimeLocal> animesMarcadosMAL = [];
+    _apiService.findAll().then((animeLocalList) {
+      _malService.getUserWatchingAnimeList(GlobalVar().token).then((favoriteAnimeList) async {
+        animeLocalList.where((element) => element.id > 0).forEach((element) {
+          if(favoriteAnimeList.any((favorite) => favorite.id == element.id)){
+            element.marcado = true;
+            animesMarcadosMAL.add(element);
+          }
+        });
+        List<AnimeLocal> dailyAnimeList = await _apiService.findAllByDay(selectedDay);
+        syncAnimeMarks(dailyAnimeList, animesMarcadosMAL);
+        localService.atualizarMarcacoes(animesMarcadosMAL);
+        setState(() {
+          _listaAnimes = dailyAnimeList;
+        });
+      });
     });
-      
   }
 
   syncAnimeMarks(List<AnimeLocal>  dailyAnimeList, List<AnimeLocal> favoriteAnimeList){
@@ -61,10 +86,12 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
     });
   }
 
+  //Como raios eu vou sincronizar os animes locais de modo a setar a data e hora de broadcast de cada um?
   _updateFavoriteAnimes() async {
-    List<AnimeLocal> userAnnimeList = await _malService.getUserWatchingAnimeList(GlobalVar().token);
-    localService.atualizarMarcacoes(userAnnimeList);
-    syncAnimeMarks(_listaAnimes, userAnnimeList);
+    syncWithMyAnimeList();
+    // List<AnimeLocal> userAnimeList = await _malService.getUserWatchingAnimeList(GlobalVar().token);
+    // localService.atualizarMarcacoes(userAnimeList);
+    // syncAnimeMarks(_listaAnimes, userAnimeList);
     Toasts.mostrarToast("Animes sincronizados com sucesso");
   }
 
@@ -145,7 +172,7 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
                   ),
                 Spacer(),
                 Text(
-                  "Mostrar somente animes marcados"
+                  "Apenas favoritos"
                 ),
                 Switch(
                   value: showOnlyMarkedAnimes,

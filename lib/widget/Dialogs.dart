@@ -67,7 +67,7 @@ class Dialogs {
 
   static Future<String> mostrarDialogUsuarioMal(BuildContext context) async {
     String resultado;
-    usuarioController.text = GlobalVar().usuarioMAL;
+    usuarioController.text = GlobalVar().user.name;
     await showDialog(
       context: context,
       builder: (context) {

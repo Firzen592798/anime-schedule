@@ -34,7 +34,7 @@ void main() {
       localService = MockLocalStorageService();
       jikanApiService = MockJikanApiService();
       schedulerService = SchedulerService();
-      schedulerService.localService = localService;
+      SchedulerService.localService = localService;
       schedulerService.jikanApiService = jikanApiService;
 
   });

@@ -1,13 +1,15 @@
+import 'dart:async';
+
 import 'package:animeschedule/core/Globals.dart';
-import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service-impl/MALService.dart';
-import 'package:animeschedule/service/IAnimeApiService.dart';
+import 'package:animeschedule/service-impl/SchedulerService.dart';
 import 'package:animeschedule/service/ILocalStorageService.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../core/Properties.dart';
 import '../service-impl/LocalStorageService.dart';
+import 'MeusAnimesView.dart';
 
 class LoginView extends StatefulWidget {
 
@@ -16,6 +18,7 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  bool DEBUG_ACTIONS = true;
 
   MALService malService = MALService();
 
@@ -36,15 +39,35 @@ class _LoginViewState extends State<LoginView> {
 }
 ''';
 
+  void debugActions(){
+    if(DEBUG_ACTIONS){
+      localStorageService.printStorage();
+      SchedulerService schedulerService = SchedulerService();
+      DateTime now = DateTime.now();
+      int hour = now.hour;
+      int minutes = now.minute + 1;
+      String timeOfDay ="${hour.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}";
+      schedulerService.scheduleFixedTimeOfDay(timeOfDay, now);
+    }
+  }
+
+  //Fazer uma tela de splash pra carregar umas coisinhas antes de entrar na tela MeusAnimesView
   @override
   Future<void> initState() {
     //localStorageService.saveToken(TOKEN);
     authorizationUrl = malService.getAuthorizationPage();
+    debugActions();
     localStorageService.getToken().then((token) async {
       if(token != null){
         print("Token not null");
         GlobalVar().token = token;
-        Navigator.pushNamed(context, "/meusanimes");
+        await localStorageService.getUser().then((user) async {
+           GlobalVar().user = user;
+        });
+        Navigator.pushReplacement(context,
+          MaterialPageRoute(
+          builder: (context) => MeusAnimesView()));
+        
       }else{
         print(authorizationUrl);
       }
@@ -55,15 +78,12 @@ class _LoginViewState extends State<LoginView> {
 
 
 
-  Future<void> handleAuthorizationCodeUrl(String url) async {
-    print("CODE=");
-    print(url);
+  Future<String> handleAuthorizationCodeUrl(String url) async {
+    print("handleAuthorizationCodeUrl");
     String code = url.split("code=")[1].split("&state")[0];
-    print(code);
     String tokenJson = await malService.generateToken(code);
-    print("JSON = "+tokenJson);
     String token = await localStorageService.saveToken(tokenJson);
-    print("Token "+token);
+    return token;
   }
 
   @override
@@ -79,8 +99,20 @@ class _LoginViewState extends State<LoginView> {
           initialUrl: authorizationUrl,
           navigationDelegate: (navReq) async {
             if (navReq.url.startsWith("http://localhost/oauth")) {
-              await handleAuthorizationCodeUrl(navReq.url);
-              Navigator.pushNamed(context, "/meusanimes");
+              String token = await handleAuthorizationCodeUrl(navReq.url);
+              await malService.getUserData(token).then((response) {
+                print("getUserData");
+                if(!response.isError){
+                  GlobalVar().firstMalLogin = true;
+                  GlobalVar().user = response.data;
+                  localStorageService.saveUser(response.data);
+                }
+              });
+              /*malService.getUserWatchingAnimeList(token).then((userAnimeList) {
+                localStorageService.atualizarMarcacoes(userAnimeList);
+              });*/
+              print("First login ${GlobalVar().isFirstMalLogin}");
+              Navigator.pushReplacementNamed(context, "/meusanimes");
               return NavigationDecision.prevent;
             }
             if (navReq.url.startsWith(Properties.URL_API_AUTENTICACAO)) {
@@ -93,17 +125,5 @@ class _LoginViewState extends State<LoginView> {
         )
       )
     );
-    /*return Container(
-      child: InAppWebView(
-        initialUrlRequest: URLRequest(url: Uri.parse("https://www.google.com.br")),
-        androidOnPermissionRequest: (controller, origin, resources) async {
-          return PermissionRequestResponse(
-              resources: resources,
-              action: PermissionRequestResponseAction.GRANT);
-        },
-        
-        
-      )
-    );*/
   }
 }

@@ -1,5 +1,6 @@
 import '../domain/AnimeLocal.dart';
 import '../domain/ConfigPrefs.dart';
+import '../domain/User.dart';
 
 abstract class ILocalStorageService{
   Future<ConfigPrefs> getConfigPrefs();
@@ -21,4 +22,12 @@ abstract class ILocalStorageService{
   Future<String> saveToken(String token);
 
   Future<String> getToken();
+
+  Future<String> saveUser(User user);
+
+  Future<User> getUser();
+
+  Future<void> deslogar();
+
+  void printStorage();
 }

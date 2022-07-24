@@ -81,8 +81,8 @@ class AnimeLocal implements Comparable<AnimeLocal> {
   set correctBroadcastEnd(DateTime value) => this._correctBroadcastEnd = value;
 
   String get transmissionRange {
-    String transmissionRangeStr = this.correctBroadcastStart != null ? DateFormat("dd/MM/yyyy").format(this.correctBroadcastStart) +" - " : "";
-    transmissionRangeStr += this.correctBroadcastEnd == null ? "Indefinido" : DateFormat("dd/MM/yyyy").format(this.correctBroadcastEnd) ;
+    String transmissionRangeStr = this.correctBroadcastStart != null ? DateFormat("dd/MM/yyyy").format(this.correctBroadcastStart) : "";
+    transmissionRangeStr += this.correctBroadcastEnd == null ? "" : " - " + DateFormat("dd/MM/yyyy").format(this.correctBroadcastEnd) ;
     return transmissionRangeStr;
   }
 

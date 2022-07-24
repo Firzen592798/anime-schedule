@@ -1,4 +1,6 @@
 
+import '../domain/User.dart';
+
 class GlobalVar{
   factory GlobalVar() {
     return _singleton;
@@ -7,15 +9,17 @@ class GlobalVar{
 
   GlobalVar._internal();
 
-  String _usuarioMAL;
+  User _user;
 
   String _token;
 
   String _refreshTOken;
 
-  String get usuarioMAL => _usuarioMAL;
+  bool _firstMalLogin = false;
 
-  set usuarioMAL(String value) => _usuarioMAL = value;
+  User get user => _user;
+
+  set user(User value) => _user = value;
 
   get token => this._token;
 
@@ -24,4 +28,10 @@ class GlobalVar{
   get refreshTOken => this._refreshTOken;
 
   set refreshTOken( value) => this._refreshTOken = value;
+
+  get isLoggedIn => this._token != null ? true : false;
+
+  set firstMalLogin(bool value) => this._firstMalLogin = value;
+
+  get isFirstMalLogin => this._firstMalLogin;
 }

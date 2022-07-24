@@ -1360,6 +1360,35 @@ class Json {
   }
   ''';
 
+  static const String USER_DATA = '''
+    {
+        "id": 1179953,
+        "name": "Firzen592798",
+        "gender": "male",
+        "birthday": "1992-03-14",
+        "location": "Brazil",
+        "joined_at": "2012-03-03T23:53:56+00:00",
+        "picture": "https://api-cdn.myanimelist.net/images/userimages/1179953.jpg?t=1658088000",
+        "anime_statistics": {
+            "num_items_watching": 12,
+            "num_items_completed": 1386,
+            "num_items_on_hold": 11,
+            "num_items_dropped": 80,
+            "num_items_plan_to_watch": 58,
+            "num_items": 1547,
+            "num_days_watched": 439.39,
+            "num_days_watching": 23.52,
+            "num_days_completed": 407.14,
+            "num_days_on_hold": 2.61,
+            "num_days_dropped": 6.11,
+            "num_days": 439.38,
+            "num_episodes": 26868,
+            "num_times_rewatched": 64,
+            "mean_score": 6.81
+        }
+    }
+  ''';  
+
   static const String TOKEN = '''
     {"token_type":"Bearer","expires_in":2678400,"access_token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImNlNTM4ODc5OTNjNzY4YTk1ZTVjODdiNjdiNzdiZGI0ZTNlNTc3NTUxMmQ2YWVjMjg1MDU1NzhiYTk1NTEzZDk0ZDUzZjUxNTRjOTVjZjgyIn0.eyJhdWQiOiIzZjIzNjJjM2I0NTEzNTE5MDE1ODNjNDE4MmE5Nzk0NSIsImp0aSI6ImNlNTM4ODc5OTNjNzY4YTk1ZTVjODdiNjdiNzdiZGI0ZTNlNTc3NTUxMmQ2YWVjMjg1MDU1NzhiYTk1NTEzZDk0ZDUzZjUxNTRjOTVjZjgyIiwiaWF0IjoxNjU3MjQxNTAwLCJuYmYiOjE2NTcyNDE1MDAsImV4cCI6MTY1OTkxOTkwMCwic3ViIjoiMTE3OTk1MyIsInNjb3BlcyI6W119.L9jPNA8dgSKQ27Lx2LLNY89xnhdn5ngBkvA6CT_02oe1G9huhRv15tP-2KeepiLH14R7_eTQ1Wmit3YOUVeR52nOggfzetwGDY_qPjl0QjYURDeDNyVuOUiT0qs_XmC-NAte27m8mBZ-MWeRfKxbmq9-o2XtMYKe3QZ9dPgCXaHF3Ha6CvFOCVksBmQTcjK-eBKi_mOxUzvdY8fbp9KFmgQQ9yC-gjBlu4VxaxdRAQmI-tmK6Q-7b0kuiYdDAN-hRibPWmZEOiS_sF2818hQNvgM0XwXQdCSaoOyYS5rJeNgUjrtU_0chAUBbGpH5sODZUkTzDkJNhnCm6yPceHvgA","refresh_token":"def502008fec992240f2b9103ea170e455f5b728626542bb39d1fd36a63f9b33962d310b321d841bf08976135e96ca3529e68d526b66fffa72785b83d3228caca3911ebc7d49bc3477cd614381aeea"}
   ''';

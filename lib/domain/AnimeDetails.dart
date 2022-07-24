@@ -32,7 +32,7 @@ class AnimeDetails {
 
   AnimeDetails.fromJson(Map<String, dynamic> json){
       json = json['data'];
-      _synopsis = json['synopsis'];
+      _synopsis = json['synopsis'] ?? 'No data';
       _urlImagemGrande = json['images']['jpg']['large_image_url'];
       _genres = (json['genres'] as List).map((e) => e['name'] as String).toList();
       _studios = (json['studios'] as List).map((e) => e['name'] as String).toList();

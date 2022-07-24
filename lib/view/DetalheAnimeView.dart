@@ -1,5 +1,4 @@
 import 'package:animeschedule/core/CustomColors.dart';
-import 'package:animeschedule/model/AnimeApi.dart';
 import 'package:animeschedule/service-impl/JikanApiService.dart';
 import 'package:animeschedule/service/IAnimeApiService.dart';
 import 'package:animeschedule/service/ILocalStorageService.dart';

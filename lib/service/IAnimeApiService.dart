@@ -14,5 +14,7 @@ abstract class IAnimeAPiService{
 
   Future<List<AnimeLocal>> findAllByDay(selectedDay); 
 
+  Future<List<AnimeLocal>> findAll(); 
+
   Future<AnimeDetails> loadAnimeDetails(int id);
 }

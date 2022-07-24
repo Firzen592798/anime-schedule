@@ -26,7 +26,7 @@ class NotificationService{
     
     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: selectNotification);
-    _setupTimezone();
+    //_setupTimezone();
   }
 
   Future<void> _setupTimezone() async {
@@ -62,25 +62,25 @@ class NotificationService{
         payload: notification.body).catchError((error) => print("erro de notificação: " + error.toString()));
   }
 
-  showNotificationScheduled(LocalNotification notification, Duration duration) {
-    AndroidNotificationDetails androidDetails = _setupAndroidDetails();
+  // showNotificationScheduled(LocalNotification notification, Duration duration) {
+  //   AndroidNotificationDetails androidDetails = _setupAndroidDetails();
 
-    final date = DateTime.now().add(duration);
-    flutterLocalNotificationsPlugin.zonedSchedule(
-      notification.id,
-      notification.title,
-      notification.body,
+  //   final date = DateTime.now().add(duration);
+  //   flutterLocalNotificationsPlugin.zonedSchedule(
+  //     notification.id,
+  //     notification.title,
+  //     notification.body,
       
-      tz.TZDateTime.from(date, tz.local),
-      NotificationDetails(
-        android: androidDetails,
-      ),
+  //     tz.TZDateTime.from(date, tz.local),
+  //     NotificationDetails(
+  //       android: androidDetails,
+  //     ),
       
-      payload: notification.payload,
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-    );
-  }
+  //     payload: notification.payload,
+  //     androidAllowWhileIdle: true,
+  //     uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+  //   );
+  // }
 
 
   void cancelNotification(){

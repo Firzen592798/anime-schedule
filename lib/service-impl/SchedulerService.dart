@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:animeschedule/domain/LocalNotification.dart';
 import 'package:animeschedule/domain/AnimeLocal.dart';
@@ -13,11 +15,11 @@ class SchedulerService{
 
   final dailyUpdateScheduledId = 999;
 
-  ILocalStorageService localService = LocalStorageService();
+  static ILocalStorageService localService = LocalStorageService();
 
   IAnimeAPiService jikanApiService = JikanApiService();
 
-  NotificationService notificationService = NotificationService();
+  static NotificationService notificationService = NotificationService();
 
   static final SchedulerService _singleton = SchedulerService._internal();
   
@@ -27,12 +29,15 @@ class SchedulerService{
     return _singleton;
   }
 
-  void doRearrangeNotifications() {
-    print("Iniciando notificação");
+  static void doRearrangeNotifications() {
+    print("doRearrangeNotification");
     int weekday = DateTime.now().weekday - 1;
     print(weekday);
     localService.getMarkedAnimesByDay(weekday).then(((animeList) {
+      print("animeList");
+      print(animeList);
       if(animeList.isNotEmpty){
+        print("notEmpty");
         notificationService.showNotification(LocalNotification.from(animeList));
       }
     }));
@@ -104,11 +109,40 @@ class SchedulerService{
     return localAnimeData;
   }
 
+  static void alarmTest() {
+    print("naostatic");
+  }
+
+  void runAlarm() {
+    AndroidAlarmManager.oneShot(
+      Duration(seconds: 10),
+      1,
+      doRearrangeNotifications,
+      wakeup: true,
+    ).then((val) => print(val));
+  }
+
+  void runPeriodicTest(){
+    AndroidAlarmManager.periodic(
+      Duration(seconds: 60),
+      1, 
+      alarmTest,
+      startAt: DateTime.now(), 
+      wakeup: true,
+   );
+  }
+
   Future<DateTime> scheduleFixedTimeOfDay(String timeOfDay, [DateTime dateNow]) async {
+    AndroidAlarmManager.cancel(0);
+    AndroidAlarmManager.cancel(1);
+    AndroidAlarmManager.cancel(2);
+    runAlarm();
     if(dateNow == null){
       dateNow = DateTime.now();
     }
-    await AndroidAlarmManager.initialize();
+    print("Agendando para ${timeOfDay} para o dia ${dateNow.toIso8601String()}");
+    //await AndroidAlarmManager.initialize();
+    
     AndroidAlarmManager.cancel(fixedTimeScheduledId);
     int scheduledHour = int.tryParse(timeOfDay.split(":")[0]);
     int scheduledMinutes = int.tryParse(timeOfDay.split(":")[1]);
@@ -121,13 +155,14 @@ class SchedulerService{
       startDate = startDate.add(Duration(days: 1));
     }
 
-
+    print("Agendado para ${startDate.toIso8601String()}");
     AndroidAlarmManager.periodic(
       const Duration(hours: 24),
-      fixedTimeScheduledId, 
+      0, 
       doRearrangeNotifications,
-      startAt: startDate, 
+      startAt: DateTime.now(), 
       allowWhileIdle: true,
+      wakeup: true,
    );
    return startDate;
   }
