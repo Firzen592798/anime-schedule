@@ -3,6 +3,7 @@ import 'package:animeschedule/themes/AppTheme.dart';
 import 'package:animeschedule/view/LoginView.dart';
 import 'package:animeschedule/view/MeusAnimesView.dart';
 import 'package:animeschedule/view/PreferenciasView.dart';
+import 'package:animeschedule/view/SplashView.dart';
 import 'package:flutter/material.dart';
 
 import 'service-impl/NotificationService.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: AppTheme().themedata,
       debugShowCheckedModeBanner: false,
-      home: MeusAnimesView(),
+      home: SplashView(),
             routes: {
         //'/test': (_) => SearchTest(),
         '/login': (_) => LoginView(),

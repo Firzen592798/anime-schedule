@@ -39,40 +39,12 @@ class _LoginViewState extends State<LoginView> {
 }
 ''';
 
-  void debugActions(){
-    if(DEBUG_ACTIONS){
-      localStorageService.printStorage();
-      SchedulerService schedulerService = SchedulerService();
-      DateTime now = DateTime.now();
-      int hour = now.hour;
-      int minutes = now.minute + 1;
-      String timeOfDay ="${hour.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}";
-      schedulerService.scheduleFixedTimeOfDay(timeOfDay, now);
-    }
-  }
+
 
   //Fazer uma tela de splash pra carregar umas coisinhas antes de entrar na tela MeusAnimesView
   @override
   Future<void> initState() {
-    //localStorageService.saveToken(TOKEN);
     authorizationUrl = malService.getAuthorizationPage();
-    debugActions();
-    localStorageService.getToken().then((token) async {
-      if(token != null){
-        print("Token not null");
-        GlobalVar().token = token;
-        await localStorageService.getUser().then((user) async {
-           GlobalVar().user = user;
-        });
-        Navigator.pushReplacement(context,
-          MaterialPageRoute(
-          builder: (context) => MeusAnimesView()));
-        
-      }else{
-        print(authorizationUrl);
-      }
-    });
-
     super.initState();
   }
 
@@ -103,6 +75,7 @@ class _LoginViewState extends State<LoginView> {
               await malService.getUserData(token).then((response) {
                 print("getUserData");
                 if(!response.isError){
+                  GlobalVar().token = token;
                   GlobalVar().firstMalLogin = true;
                   GlobalVar().user = response.data;
                   localStorageService.saveUser(response.data);

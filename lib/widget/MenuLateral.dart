@@ -66,6 +66,7 @@ class _MenuLateralState extends State<MenuLateral> {
           if(!GlobalVar().isLoggedIn) ListTile(
             title: Text('Entrar no MyAnimeList'),
             onTap: () {
+              Navigator.pop(context);
               Navigator.pushReplacement(context,
                 MaterialPageRoute(
                   builder: (context) => LoginView()));
@@ -74,10 +75,11 @@ class _MenuLateralState extends State<MenuLateral> {
           if(GlobalVar().isLoggedIn) ListTile(
             title: Text('Deslogar'),
             onTap: () async {
+              Navigator.pop(context);
               await LocalStorageService().deslogar();
-              Navigator.pushReplacement(context,
-                MaterialPageRoute(
-                  builder: (context) => MeusAnimesView()));
+              Navigator.pushReplacementNamed(context,'/meusanimes',arguments: {
+                'restart': true,
+              });
             },
           ),
           ListTile(

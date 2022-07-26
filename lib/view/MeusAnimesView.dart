@@ -36,10 +36,10 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
 
   @override
   initState() {
-    
     super.initState();
     selectedDay = (DateTime.now().weekday - 1) % 7;
-    _carregarAnimes();
+    _listaAnimes.map((e) => e.marcado = false);
+    _carregarAnimes();    
   }
 
   _carregarAnimes() async{
@@ -56,6 +56,11 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
         _listaAnimes = dailyAnimeList;
       });
     }
+  }
+
+  resetScreen(){
+    _listaAnimes = [];
+    _carregarAnimes();
   }
 
   syncWithMyAnimeList(){
@@ -82,6 +87,8 @@ class _MeusAnimesViewState extends State<MeusAnimesView> {
     dailyAnimeList.where((element) => element.id > 0).forEach((element) {
       if(favoriteAnimeList.any((favorite) => favorite.id == element.id)){
         element.marcado = true;
+      }else{
+         element.marcado = false;
       }
     });
   }
