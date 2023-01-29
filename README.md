@@ -1,16 +1,5 @@
-# animeschedule
+# Anime Schedule
 
-A new Flutter project.
+Aplicativo para acompanhamento dos lançamentos de anime semanais. Possui integração com o myanimelist e terá a capacidade de gerar notificações sobre os lançamentos de anime do dia
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<img width="300" src="https://user-images.githubusercontent.com/1834518/215299354-c9abea64-fa90-4a74-9a69-ab326b0bd533.png"></img>
